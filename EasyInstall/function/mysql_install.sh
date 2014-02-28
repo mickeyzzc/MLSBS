@@ -1,20 +1,23 @@
 #!/bin/bash
 #base mysql's parameter
-MysqlVersion="Percona-Server-5.6.15-rel63.0"
-MysqlLine="http://www.percona.com/downloads/Percona-Server-5.6/LATEST/source"
-MysqlPath="/usr/local/mysql"
-MysqlDataPath="$MysqlPath/data"
-MysqlLogPath="/var/log/mysql"
-MysqlConfigPath="$MysqlPath"
-MysqlPass=""
-MYSQL_BASE_PACKAGES_INSTALL(){
+MYSQL_VAR(){
+	MysqlVersion="Percona-Server-5.6.15-rel63.0"
+	MysqlLine="http://www.percona.com/downloads/Percona-Server-5.6/LATEST/source"
+	MysqlPath="/usr/local/mysql"
+	MysqlDataPath="$MysqlPath/data"
+	MysqlLogPath="/var/log/mysql"
+	MysqlConfigPath="$MysqlPath"
+	MysqlPass=""
 	[[ "$MysqlPass" == '' ]] && echo "Please input MYSQL's password:";read MysqlPass
+}
+MYSQL_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove mysql-server mysql;
 		BasePackages="gcc gcc-c++ openssl-devel ncurses-devel bison cmake make";
 	else
 		apt-get -y remove mysql-client mysql-server mysql-common;
 		BasePackages="gcc g++ cmake make bison libncurses5-dev libncurses5 libssl-dev";
+	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }
 #install mysql
@@ -121,4 +124,3 @@ EOF
 # **************************************
 	echo "[OK] ${MysqlVersion} install completed.";
 }
-MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL

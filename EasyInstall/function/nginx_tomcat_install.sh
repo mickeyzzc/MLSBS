@@ -1,10 +1,14 @@
 #!/bin/bash
-SysName=
-TomcatVersion=""
-NginxVersion="nginx-1.4.5"
-NginxPath="/usr/local/nginx"
-ServerIP="127.0.0.1"
-ServerHostName=""
+
+NGINX_VAR(){
+	SysName=
+	TomcatVersion=""
+	NginxVersion="nginx-1.4.5"
+	NginxPath="/usr/local/nginx"
+	ServerIP="127.0.0.1"
+	ServerHostName=""
+	[[ "$ServerHostName" == '' ]] && echo "Please input domain name:";read ServerHostName
+}
 NGINX_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove httpd;
@@ -25,8 +29,7 @@ NGINX_INSTALL(){
 	make && make install
 }
 NGINX_CONF_SET(){
-	JAVARAM=`expr $RamTotal / 2`
-	sed -i "/\/bin\//a JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m\"" /usr/share/tomcat$TomcatVersion/bin/catalina.sh
+	[[ "$TomcatVersion" != "" ]] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "/\/bin\//a JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m\"" /usr/share/$TomcatVersion/bin/catalina.sh
 	[ -f $NginxPath/conf/nginx.conf ] && cp $NginxPath/conf/nginx.conf $NginxPath/conf/nginx.conf.backup$(date +%Y%m%d%H%M)
 cat >$NginxPath/conf/nginx.conf <<EOF
 user www-data;
@@ -75,12 +78,11 @@ server{
 EOF
 	chown www-data:www-data $NginxPath/conf/server/*
 	chmod 775 $NginxPath/conf/server/*
-	$NginxPath/sbin/nginx -s reload
+	$NginxPath/sbin/nginx
 }
 #main
 SELECT_NGINX_TOMCAT_FUNCTION(){
 	clear;
-	[[ "$ServerHostName" == '' ]] && echo "Please input domain name:";read ServerHostName
 	echo "[Notice] Which tomcat's version you want to install:"
 	select var in "tomcat6" "tomcat7" "just nginx and proxy other ip" "back";do
 		case $var in
@@ -99,5 +101,3 @@ SELECT_NGINX_TOMCAT_FUNCTION(){
 		break
 	done
 }
-SELECT_NGINX_TOMCAT_FUNCTION
-
