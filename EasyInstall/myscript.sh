@@ -18,7 +18,7 @@ SELECT_RUN_SCRIPT(){
 	clear;
 	TEST_SCRIPT system_base_set.sh
 	echo "[Notice] Which function you want to run:"
-	select var in "Initialize System" "Install nginx with tomcat" "Install Mysql" "Install nginx and tomcat and mysql" "Install Puppet";do
+	select var in "Initialize System" "Install nginx with tomcat" "Install Mysql" "Install nginx and tomcat and mysql" "Install Puppet" "Exit";do
 		case $var in
 			"Initialize System")
 				SELECT_SYSTEM_BASE_FUNCTION;;
@@ -34,6 +34,8 @@ SELECT_RUN_SCRIPT(){
 				NGINX_VAR && MYSQL_VAR && SELECT_NGINX_TOMCAT_FUNCTION && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
 			"Install Puppet")
 				TEST_SCRIPT puppet_install.sh;;
+			"Exit")
+				exit 0;;
 			*)
 				SELECT_RUN_SCRIPT;;
 		esac

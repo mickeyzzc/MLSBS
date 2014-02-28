@@ -99,4 +99,5 @@ SELECT_SYSTEM_BASE_FUNCTION(){
 		esac
 		break
 	done
+	SELECT_RUN_SCRIPT
 }

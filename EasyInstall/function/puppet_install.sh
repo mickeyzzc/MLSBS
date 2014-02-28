@@ -107,7 +107,7 @@ SELECT_PUPPET_FUNCTION(){
 	select var in "Puppet server install" "Puppet client install" "back";do
 		case $var in
 			"Puppet server install")
-				PuppetApplication='puppetmaster' &&	PUPPET_SOURCE_INSTALL && PUPPET_SET && GIT_INSTALL;;
+				PuppetApplication='puppetmaster' && PUPPET_SOURCE_INSTALL && PUPPET_SET && GIT_INSTALL;;
 			"Puppet client install")
 				PuppetApplication='puppet' && PUPPET_SOURCE_INSTALL && PUPPET_SET;;
 			"back")
