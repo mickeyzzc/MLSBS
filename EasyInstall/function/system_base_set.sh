@@ -21,7 +21,7 @@ ADMINUSER_ADD(){
 	[[ "$AdminUser" == '' ]] && echo "Please input AdminUser's name:";read AdminUser
 	[[ "$AdminPwd" == '' ]] && echo "Please input AdminUser's password:";read AdminPwd
 	useradd -G sudo -d /home/$AdminUser -m -N -s /bin/bash $AdminUser
-	echo "$AdminPwd" |passwd --stdin $AdminUser
+	echo $AdminUser:"$AdminPwd" |chpasswd
 }
 #install some tool
 INSTALL_BASE_PACKAGES(){

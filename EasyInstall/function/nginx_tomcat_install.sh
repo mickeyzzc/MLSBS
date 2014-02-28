@@ -12,6 +12,7 @@ NGINX_BASE_PACKAGES_INSTALL(){
 	else
 		apt-get -y remove nginx apache2 apache2-doc apache2-utils apache2.2-common apache2.2-bin apache2-mpm-prefork apache2-doc apache2-mpm-worker;
 		BasePackages="gcc g++ make libpcre3 libpcre3-dev libssl-dev zlibc openssl zlib1g zlib1g-dev $TomcatVersion";
+	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }
 NGINX_INSTALL(){
@@ -21,7 +22,7 @@ NGINX_INSTALL(){
 	tar zxf $NginxVersion.tar.gz
 	cd /tmp/$NginxVersion
 	./configure  --prefix=$NginxPath --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --with-http_realip_module --conf-path=$NginxPath/conf/nginx.conf --with-mail --with-mail_ssl_module
-	make -j $CpuNum && make install
+	make && make install
 }
 NGINX_CONF_SET(){
 	JAVARAM=`expr $RamTotal / 2`
