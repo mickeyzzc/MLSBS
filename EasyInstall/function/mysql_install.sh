@@ -1,5 +1,6 @@
 #!/bin/bash
 #base mysql's parameter
+[ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && exit 1;
 MYSQL_VAR(){
 	MysqlVersion="Percona-Server-5.6.15-rel63.0"
 	MysqlLine="http://www.percona.com/downloads/Percona-Server-5.6/LATEST/source"
@@ -13,10 +14,10 @@ MYSQL_VAR(){
 MYSQL_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove mysql-server mysql;
-		BasePackages="gcc gcc-c++ openssl-devel ncurses-devel bison cmake make";
+		BasePackages="gcc gcc-c++ autoconf libxml2-devel zlib-devel libjpeg-devel libpng-devel glibc-devel glibc-static glib2-devel  bzip2-devel openssl-devel ncurses-devel bison cmake make";
 	else
 		apt-get -y remove mysql-client mysql-server mysql-common;
-		BasePackages="gcc g++ cmake make bison libncurses5-dev libncurses5 libssl-dev";
+		BasePackages="gcc g++ cmake libjpeg-dev libxml2 libxml2-dev libpng-dev autoconf make bison zlibc bzip2 libncurses5-dev libncurses5 libssl-dev";
 	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }
@@ -29,7 +30,7 @@ INSTALL_MYSQL(){
 	cd /tmp/$MysqlVersion;
 	groupadd mysql;
 	useradd -s /sbin/nologin -g mysql mysql;
-	cmake -DCMAKE_INSTALL_PREFIX=$MysqlPath  -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=ON -DENABLED_LOCAL_INFILE=ON -DWITH_INNODB_MEMCACHED=ON -DWITH_UNIT_TESTS=OFF;
+	cmake -DCMAKE_INSTALL_PREFIX=$MysqlPath -DWITH_DEBUG=OFF -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=ON -DENABLED_LOCAL_INFILE=ON -DWITH_INNODB_MEMCACHED=ON -DWITH_UNIT_TESTS=OFF;
 	make &&	make install;
 	for path in $MysqlLogPath $MysqlPath $MysqlConfigPath/conf.d $MysqlDataPath;do
 		[ ! -d $path ] && mkdir -p $path
@@ -41,8 +42,8 @@ cat > $MysqlConfigPath/my.cnf<<EOF;
 [mysqld]
 user		= mysql
 server-id	= 1
-pid-file	= /tmp/mysqld.pid
-socket		= /tmp/mysqld.sock
+pid-file	= /tmp/mysql.pid
+socket		= /tmp/mysql.sock
 port		= 3306
 basedir		= $MysqlPath
 datadir		= $MysqlDataPath
