@@ -1,0 +1,121 @@
+#!/bin/bash
+#base puppet's parameter
+PuppetServer=""
+PuppetVersion="puppet-3.4.2"
+FacterVersion="facter-1.7.5"
+RubyVersion="ruby-2.0.0-p353"
+GitVersion="git-1.8.5.4"
+OpenSSLVersion="openssl-1.0.1f"
+ServerIp=""
+#install ruby
+RUBY_INSTALL(){
+	cd /tmp
+	[ ! -f $RubyVersion.tar.gz ] && curl -O ftp://ftp.ruby-lang.org/pub/ruby/$RubyVersion.tar.gz
+	[ ! -f $OpenSSLVersion.tar.gz ] && curl -O ftp://ftp.openssl.org/source/$OpenSSLVersion.tar.gz
+	tar xzf $RubyVersion.tar.gz
+	tar xzf $OpenSSLVersion.tar.gz
+	cd /tmp/$OpenSSLVersion &&
+	./Configure linux-x86_64 --shared &&
+	make && make install
+	mv /usr/bin/openssl{,.old}
+	ln -s /usr/local/ssl/bin/openssl /usr/bin/openssl
+	cd /tmp/$RubyVersion &&
+	./configure --with-openssl-dir=/usr/local/ssl --enable-shared &&
+	make && make install
+}
+#install git
+GIT_INSTALL(){
+	cd /tmp
+	[ ! -f $GitVersion.tar.gz ] && curl -O https://git-core.googlecode.com/files/$GitVersion.tar.gz
+	tar zxf $GitVersion.tar.gz
+	cd /tmp/$GitVersion
+	./configure
+	make && make install
+}
+#install puppet's base packages
+PUPPET_BASE_PACKAGES_INSTALL(){
+	#install base packages
+	[ "$SysName" == 'centos' ] && BasePackages="curl chkconfig gcc make ntp curl-devel zlib-devel perl perl-devel" || BasePackages="curl chkconfig gcc make ntpdate zlib1g-dev libcurl4-openssl-dev "
+	INSTALL_BASE_PACKAGES $BasePackages
+	#check ruby install
+	ruby -v && RubyOldVersion=`ruby -v |awk '{printf "%s\n",$2}'` 
+	[[ "$RubyOldVersion" == '' ]] && RUBY_INSTALL
+	#set system hostname
+	[[ "$PuppetServer" == '' ]] && echo "Please input PuppetServer's name:";read PuppetServer
+	[[ "$ServerIp" == '' ]] && echo "Please input PuppetServer's IP:";read ServerIp
+	HostSet=`grep '$PuppetServer' /etc/hosts`
+	[[ "$HostSet" == "" ]] && echo "$ServerIp $PuppetServer" >> /etc/hosts || sed -i "s/$HostSet/$ServerIp $PuppetServer/g" /etc/hosts
+	#call other funtion to set system timezone
+	TIMEZONE_SET
+	#[ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
+}
+#now install puppet
+PUPPET_SOURCE_INSTALL(){
+	PUPPET_BASE_PACKAGES_INSTALL
+	cd /tmp
+	[ ! -f $FacterVersion.tar.gz ] && curl -O https://downloads.puppetlabs.com/facter/$FacterVersion.tar.gz
+	[ ! -f $PuppetVersion.tar.gz ] && curl -O https://downloads.puppetlabs.com/puppet/$PuppetVersion.tar.gz
+	tar xzf $FacterVersion.tar.gz
+	tar xzf $PuppetVersion.tar.gz
+	cd /tmp/$FacterVersion
+	ruby install.rb
+	cd /tmp/$PuppetVersion
+	ruby install.rb
+	sudo puppet resource group puppet ensure=present
+	sudo puppet resource user puppet ensure=present gid=puppet shell='/sbin/nologin'
+	if [[ "$SysName" == 'centos' ]]; then
+		[[ "$PuppetApplication" == 'puppetmaster' ]] && cp -af /tmp/$PuppetVersion/ext/redhat/server.init /etc/init.d/$PuppetApplication || cp -af /tmp/$PuppetVersion/ext/redhat/client.init /etc/init.d/$PuppetApplication 
+	else
+		if [[ "$PuppetApplication" == 'puppetmaster' ]]; then
+			cp -af /tmp/$PuppetVersion/ext/debian/puppetmaster.init /etc/init.d/$PuppetApplication
+			cp -af /tmp/$PuppetVersion/ext/debian/puppetmaster.default /etc/default/$PuppetApplication
+		else
+			cp -af /tmp/$PuppetVersion/ext/debian/puppet.init /etc/init.d/$PuppetApplication
+			cp -af /tmp/$PuppetVersion/ext/debian/puppet.default /etc/default/$PuppetApplication
+		fi
+		ln -s /usr/local/bin/puppet /usr/bin/puppet
+	fi
+}
+#puppet's configure setup
+PUPPET_SET(){
+	[ ! -f /etc/puppet/puppet.conf ] && touch /etc/puppet/puppet.conf && echo >/etc/puppet/puppet.conf
+cat >/etc/puppet/puppet.conf <<EOF
+[main]
+	server = $PuppetServer
+	logdir = /var/log/puppet
+	rundir = /var/run/puppet
+	ssldir = \$vardir/ssl
+[agent]
+	classfile = \$vardir/classes.txt
+	localconfig = \$vardir/localconfig
+[master]
+EOF
+	if [[ "$PuppetApplication" == 'puppetmaster' ]]; then
+		sed -i "/main/a certname = $PuppetServer" /etc/puppet/puppet.conf
+		#sed -i "/master/a autosign = ture" /etc/puppet/puppet.conf
+	else
+		sed -i "/agent/a listen = true" /etc/puppet/puppet.conf
+		sed -i "1 i path /run\nauth any\nmethod save\nallow $PuppetServer" /etc/puppet/auth.conf
+	fi
+	chmod +x /etc/init.d/$PuppetApplication
+	service $PuppetApplication start
+}
+#main
+SELECT_PUPPET_FUNCTION(){
+	clear;
+	echo "[Notice] Which system_base_function you want to run:"
+	select var in "Puppet server install" "Puppet client install" "back";do
+		case $var in
+			"Puppet server install")
+				PuppetApplication='puppetmaster' &&	PUPPET_SOURCE_INSTALL && PUPPET_SET && GIT_INSTALL;;
+			"Puppet client install")
+				PuppetApplication='puppet' && PUPPET_SOURCE_INSTALL && PUPPET_SET;;
+			"back")
+				SELECT_RUN_SCRIPT;;
+			*)
+				SELECT_PUPPET_FUNCTION;;
+		esac
+		break
+	done
+}
+SELECT_PUPPET_FUNCTION
