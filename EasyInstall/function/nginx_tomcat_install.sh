@@ -1,7 +1,6 @@
 #!/bin/bash
 
 NGINX_VAR(){
-	SysName=
 	TomcatVersion=""
 	NginxVersion="nginx-1.4.5"
 	NginxPath="/usr/local/nginx"

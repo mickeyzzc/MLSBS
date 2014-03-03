@@ -23,6 +23,16 @@ ADMINUSER_ADD(){
 	useradd -G sudo -d /home/$AdminUser -m -N -s /bin/bash $AdminUser
 	echo $AdminUser:"$AdminPwd" |chpasswd
 }
+OTHER_USER_NOLONGIN(){
+	for UserID in `grep -vE "root|sys" /etc/passwd|cut -d : -f 3`; do
+		UserName=`awk -F ':' -v UserID="$UserID" '{if (UserID == $3) print $1}' /etc/passwd`
+		if [ "$SysName" == 'centos' -a "$UserID" -lt 500 ] || [ "$SysName" != 'centos' -a "$UserID" -lt 1000 ];then
+			passwd -l $UserName
+			usermod -s /sbin/nologin $UserName
+			echo -e "$UserName is disenable login"
+		fi
+	done
+}
 #install some tool
 INSTALL_BASE_PACKAGES(){
 	if [ "$SysName" == 'centos' ]; then
@@ -82,10 +92,12 @@ EOF
 SELECT_SYSTEM_BASE_FUNCTION(){
 	clear;
 	echo "[Notice] Which system_base_function you want to run:"
-	select var in "Admin user add" "System base packages install" "Timezone set" "System core set" "back";do
+	select var in "Admin user add" "Prohibit the default user" "System base packages install" "Timezone set" "System core set" "back";do
 		case $var in
 			"Admin User Add")
 				ADMINUSER_ADD;;
+			"Prohibit the default user")
+				OTHER_USER_NOLONGIN;;
 			"System base packages install")
 				SYSTEM_BASE_PACKAGES;;
 			"Timezone set")
