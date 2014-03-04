@@ -46,5 +46,4 @@ SELECT_TOMCAT_FUNCTION(){
 		break
 	done
 	[ "$TomcatVersion" != '' -a "$JdkVersion" != '' ] && TOMCAT_INSTALL
-	SELECT_RUN_SCRIPT
 }

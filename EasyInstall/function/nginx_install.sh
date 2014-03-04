@@ -99,5 +99,4 @@ SELECT_NGINX_FUNCTION(){
 		break
 	done
 	[[ "$ServerIP" != '' ]] && NGINX_INSTALL && NGINX_CONF_SET
-	SELECT_RUN_SCRIPT
 }

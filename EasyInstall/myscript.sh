@@ -45,5 +45,6 @@ SELECT_RUN_SCRIPT(){
 		esac
 		break
 	done
+	SELECT_RUN_SCRIPT
 }
 SELECT_RUN_SCRIPT

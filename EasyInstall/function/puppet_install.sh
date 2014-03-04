@@ -121,5 +121,4 @@ SELECT_PUPPET_FUNCTION(){
 		break
 	done
 	[[ "$PuppetApplication" != '' ]] && && PUPPET_SOURCE_INSTALL && PUPPET_SET
-	SELECT_RUN_SCRIPT
 }
