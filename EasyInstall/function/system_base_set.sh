@@ -1,5 +1,8 @@
 #!/bin/bash
 #check system parameter about cpu's core ,ram ,other
+#
+#收集系统的一些基础参数给其他函数使用
+#
 SysName=""
 SysCount=""
 [[ $(id -u) != '0' ]] && echo '[Error] Please use root to run this script.' && exit;
@@ -15,6 +18,9 @@ RamSum=$[$RamTotal+$RamSwap];
 FileMax=`cat /proc/sys/fs/file-max`
 OSlimit=`ulimit -n`
 #add system's administrator
+#
+#新增一名具备sudo权限的管理员，
+#
 ADMINUSER_ADD(){
 	AdminUser=""
 	AdminPwd=""
@@ -23,6 +29,9 @@ ADMINUSER_ADD(){
 	useradd -G sudo -d /home/$AdminUser -m -N -s /bin/bash $AdminUser
 	echo $AdminUser:"$AdminPwd" |chpasswd
 }
+#
+#把其他不必要的用户屏蔽登陆
+#
 OTHER_USER_NOLONGIN(){
 	for UserID in `grep -vE "root|sys" /etc/passwd|cut -d : -f 3`; do
 		UserName=`awk -F ':' -v UserID="$UserID" '{if (UserID == $3) print $1}' /etc/passwd`
@@ -34,6 +43,9 @@ OTHER_USER_NOLONGIN(){
 	done
 }
 #install some tool
+#
+#这功能可以给其他脚本调用来安装基础软件，如编译mysql需要的gcc等工具
+#
 INSTALL_BASE_PACKAGES(){
 	if [ "$SysName" == 'centos' ]; then
 		echo '[yum-fastestmirror Installing] ************************************************** >>';
@@ -53,11 +65,17 @@ INSTALL_BASE_PACKAGES(){
 		done;
 	fi;
 }
+#
+#调用INSTALL_BASE_PACKAGES给系统安装一些必要的工具
+#
 SYSTEM_BASE_PACKAGES(){
 	[ "$SysName" == 'centos' ] && BasePackages="wget crontabs iptables logrotate openssl expect" || BasePackages="ntp logrotate wget cron curl openssl expect"
 	INSTALL_BASE_PACKAGES $BasePackages
 }
 #system timezone set
+#
+#调正时钟
+#
 TIMEZONE_SET(){
 	rm -rf /etc/localtime;
 	ln -s /usr/share/zoneinfo/Asia/Chongqing /etc/localtime;
@@ -68,6 +86,9 @@ TIMEZONE_SET(){
 	[[ "$(grep $TimeCron /etc/crontab)" == "" ]] && echo "$TimeCron" >> /etc/crontab
 	[ "$SysName" == 'centos' ] && /etc/init.d/crond restart || /etc/init.d/cron restart
 }
+#
+#系统的基本设置，可根据自己的需要添加
+#
 BASE_OS_SET(){
 # EOF **********************************
 	cat >> /etc/sysctl.conf <<EOF
