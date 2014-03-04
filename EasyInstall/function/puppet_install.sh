@@ -27,14 +27,14 @@ RUBY_INSTALL(){
 	make && make install
 }
 #install git
-GIT_INSTALL(){
-	cd /tmp
-	[ ! -f $GitVersion.tar.gz ] && curl -O https://git-core.googlecode.com/files/$GitVersion.tar.gz
-	tar zxf $GitVersion.tar.gz
-	cd /tmp/$GitVersion
-	./configure
-	make && make install
-}
+# GIT_INSTALL(){
+	# cd /tmp
+	# [ ! -f $GitVersion.tar.gz ] && curl -O https://git-core.googlecode.com/files/$GitVersion.tar.gz
+	# tar zxf $GitVersion.tar.gz
+	# cd /tmp/$GitVersion
+	# ./configure
+	# make && make install
+# }
 #install puppet's base packages
 PUPPET_BASE_PACKAGES_INSTALL(){
 	#install base packages
@@ -110,7 +110,7 @@ SELECT_PUPPET_FUNCTION(){
 	select var in "Puppet server install" "Puppet client install" "back";do
 		case $var in
 			"Puppet server install")
-				PuppetApplication='puppetmaster' && GIT_INSTALL;;
+				PuppetApplication='puppetmaster';;
 			"Puppet client install")
 				PuppetApplication='puppet';;
 			"back")

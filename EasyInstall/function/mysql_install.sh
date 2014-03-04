@@ -1,6 +1,6 @@
 #!/bin/bash
 #base mysql's parameter
-[ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && exit 1;
+[ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
 MYSQL_VAR(){
 	MysqlVersion="Percona-Server-5.6.15-rel63.0"
 	MysqlLine="http://www.percona.com/downloads/Percona-Server-5.6/LATEST/source"

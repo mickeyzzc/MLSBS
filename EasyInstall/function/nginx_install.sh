@@ -20,6 +20,8 @@ NGINX_BASE_PACKAGES_INSTALL(){
 }
 NGINX_INSTALL(){
 	NGINX_BASE_PACKAGES_INSTALL
+	groupadd www-data;
+	useradd -s /sbin/nologin -g www-data www-data;
 	cd /tmp/
 	[ ! -f $NginxVersion.tar.gz ] && curl -O http://nginx.org/download/$NginxVersion.tar.gz
 	tar zxf $NginxVersion.tar.gz
@@ -74,8 +76,8 @@ server{
     }
 }
 EOF
-	chown www-data:www-data $NginxPath/conf/server/*
-	chmod 775 $NginxPath/conf/server/*
+	chown -R www-data:www-data $NginxPath
+	chmod -R 775 $NginxPath
 	$NginxPath/sbin/nginx
 }
 #main
