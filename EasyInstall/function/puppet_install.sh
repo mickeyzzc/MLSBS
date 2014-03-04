@@ -1,12 +1,15 @@
 #!/bin/bash
 #base puppet's parameter
-PuppetServer=""
-PuppetVersion="puppet-3.4.2"
-FacterVersion="facter-1.7.5"
-RubyVersion="ruby-2.0.0-p353"
-GitVersion="git-1.8.5.4"
-OpenSSLVersion="openssl-1.0.1f"
-ServerIp=""
+PUPPET_VAR(){
+	PuppetApplication=""
+	PuppetServer=""
+	PuppetVersion="puppet-3.4.2"
+	FacterVersion="facter-1.7.5"
+	RubyVersion="ruby-2.0.0-p353"
+	GitVersion="git-1.8.5.4"
+	OpenSSLVersion="openssl-1.0.1f"
+	ServerIp=""
+}
 #install ruby
 RUBY_INSTALL(){
 	cd /tmp
@@ -107,9 +110,9 @@ SELECT_PUPPET_FUNCTION(){
 	select var in "Puppet server install" "Puppet client install" "back";do
 		case $var in
 			"Puppet server install")
-				PuppetApplication='puppetmaster' && PUPPET_SOURCE_INSTALL && PUPPET_SET && GIT_INSTALL;;
+				PuppetApplication='puppetmaster' && GIT_INSTALL;;
 			"Puppet client install")
-				PuppetApplication='puppet' && PUPPET_SOURCE_INSTALL && PUPPET_SET;;
+				PuppetApplication='puppet';;
 			"back")
 				SELECT_RUN_SCRIPT;;
 			*)
@@ -117,5 +120,6 @@ SELECT_PUPPET_FUNCTION(){
 		esac
 		break
 	done
+	[[ "$PuppetApplication" != '' ]] && && PUPPET_SOURCE_INSTALL && PUPPET_SET
+	SELECT_RUN_SCRIPT
 }
-SELECT_PUPPET_FUNCTION

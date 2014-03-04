@@ -14,10 +14,10 @@ MYSQL_VAR(){
 MYSQL_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove mysql-server mysql;
-		BasePackages="gcc gcc-c++ autoconf libxml2-devel zlib-devel libjpeg-devel libpng-devel glibc-devel glibc-static glib2-devel  bzip2-devel openssl-devel ncurses-devel bison cmake make";
+		BasePackages="wget gcc gcc-c++ autoconf libxml2-devel zlib-devel libjpeg-devel libpng-devel glibc-devel glibc-static glib2-devel  bzip2-devel openssl-devel ncurses-devel bison cmake make";
 	else
 		apt-get -y remove mysql-client mysql-server mysql-common;
-		BasePackages="gcc g++ cmake libjpeg-dev libxml2 libxml2-dev libpng-dev autoconf make bison zlibc bzip2 libncurses5-dev libncurses5 libssl-dev";
+		BasePackages="wget gcc g++ cmake libjpeg-dev libxml2 libxml2-dev libpng-dev autoconf make bison zlibc bzip2 libncurses5-dev libncurses5 libssl-dev";
 	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }

@@ -40,7 +40,7 @@ INSTALL_BASE_PACKAGES(){
 		[[ "$SysCount" == '' ]] && yum -y install yum-fastestmirror && SysCount="1"
 		cp /etc/yum.conf /etc/yum.conf.back
 		sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
-		for arg do 
+		for arg do
 			echo "[${arg} Installing] ************************************************** >>";
 			yum -y install $arg; 
 		done;

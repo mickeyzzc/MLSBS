@@ -4,17 +4,17 @@ NGINX_VAR(){
 	TomcatVersion=""
 	NginxVersion="nginx-1.4.5"
 	NginxPath="/usr/local/nginx"
-	ServerIP="127.0.0.1"
+	ServerIP=""
 	ServerHostName=""
 	[[ "$ServerHostName" == '' ]] && echo "Please input domain name:";read ServerHostName
 }
 NGINX_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove httpd;
-		BasePackages="gcc gcc-c++ openssl-devel pcre pcre-devel zlib-devel zlib make openssl $TomcatVersion";
+		BasePackages="gcc gcc-c++ openssl-devel pcre pcre-devel zlib-devel zlib make openssl";
 	else
 		apt-get -y remove nginx apache2 apache2-doc apache2-utils apache2.2-common apache2.2-bin apache2-mpm-prefork apache2-doc apache2-mpm-worker;
-		BasePackages="gcc g++ make libpcre3 libpcre3-dev libssl-dev zlibc openssl zlib1g zlib1g-dev $TomcatVersion";
+		BasePackages="gcc g++ make libpcre3 libpcre3-dev libssl-dev zlibc openssl zlib1g zlib1g-dev";
 	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }
@@ -28,7 +28,6 @@ NGINX_INSTALL(){
 	make && make install
 }
 NGINX_CONF_SET(){
-	[[ "$TomcatVersion" != "" ]] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "/\/bin\//a JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m\"" /usr/share/$TomcatVersion/bin/catalina.sh
 	[ -f $NginxPath/conf/nginx.conf ] && cp $NginxPath/conf/nginx.conf $NginxPath/conf/nginx.conf.backup$(date +%Y%m%d%H%M)
 cat >$NginxPath/conf/nginx.conf <<EOF
 user www-data;
@@ -80,23 +79,22 @@ EOF
 	$NginxPath/sbin/nginx
 }
 #main
-SELECT_NGINX_TOMCAT_FUNCTION(){
+SELECT_NGINX_FUNCTION(){
 	clear;
 	echo "[Notice] Which tomcat's version you want to install:"
-	select var in "tomcat6" "tomcat7" "just nginx and proxy other ip" "back";do
+	select var in "with localhost's tomcat" "without localhost's tomcat7" "back";do
 		case $var in
-			"tomcat6")
-				TomcatVersion="tomcat6" && NGINX_INSTALL && NGINX_CONF_SET;;
-			"tomcat7")
-				TomcatVersion="tomcat7" && NGINX_INSTALL && NGINX_CONF_SET;;
-			"just nginx and proxy other ip")
-				echo "Please input proxy tomcat's ip:";read ServerIP;
-				TomcatVersion="" && NGINX_INSTALL && NGINX_CONF_SET;;
+			"with localhost's tomcat")
+				ServerIP="127.0.0.1";;
+			"without localhost's tomcat7" )
+				echo "Please input proxy tomcat's ip:";read ServerIP;;
 			"back")
 				SELECT_RUN_SCRIPT;;
 			*)
-				SELECT_NGINX_TOMCAT_FUNCTION;;
+				SELECT_NGINX_FUNCTION;;
 		esac
 		break
 	done
+	[[ "$ServerIP" != '' ]] && NGINX_INSTALL && NGINX_CONF_SET
+	SELECT_RUN_SCRIPT
 }
