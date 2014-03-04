@@ -11,12 +11,13 @@ NGINX_VAR(){
 NGINX_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
 		yum -y remove httpd;
-		BasePackages="gcc gcc-c++ openssl-devel pcre pcre-devel zlib-devel zlib make openssl";
+		BasePackages="pidof gcc gcc-c++ openssl-devel pcre pcre-devel zlib-devel zlib make openssl";
 	else
 		apt-get -y remove nginx apache2 apache2-doc apache2-utils apache2.2-common apache2.2-bin apache2-mpm-prefork apache2-doc apache2-mpm-worker;
-		BasePackages="gcc g++ make libpcre3 libpcre3-dev libssl-dev zlibc openssl zlib1g zlib1g-dev";
+		BasePackages="pidof gcc g++ make libpcre3 libpcre3-dev libssl-dev zlibc openssl zlib1g zlib1g-dev";
 	fi
 	INSTALL_BASE_PACKAGES $BasePackages
+	kill -9 `pidof nginx`
 }
 NGINX_INSTALL(){
 	NGINX_BASE_PACKAGES_INSTALL
