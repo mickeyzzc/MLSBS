@@ -115,7 +115,7 @@ SELECT_SYSTEM_BASE_FUNCTION(){
 	echo "[Notice] Which system_base_function you want to run:"
 	select var in "Admin user add" "Prohibit the default user" "System base packages install" "Timezone set" "System core set" "back";do
 		case $var in
-			"Admin User Add")
+			"Admin user add")
 				ADMINUSER_ADD;;
 			"Prohibit the default user")
 				OTHER_USER_NOLONGIN;;
