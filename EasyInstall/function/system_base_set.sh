@@ -1,22 +1,4 @@
 #!/bin/bash
-#check system parameter about cpu's core ,ram ,other
-#
-#收集系统的一些基础参数给其他函数使用
-#
-SysName=""
-SysCount=""
-[[ $(id -u) != '0' ]] && echo '[Error] Please use root to run this script.' && exit;
-egrep -i "centos" /etc/issue && SysName='centos';
-egrep -i "debian" /etc/issue && SysName='debian';
-egrep -i "ubuntu" /etc/issue && SysName='ubuntu';
-[[ "$SysName" == '' ]] && echo '[Error] Your system is not supported this script' && exit;
-SysBit='32' && [ `getconf WORD_BIT` == '32' ] && [ `getconf LONG_BIT` == '64' ] && SysBit='64';
-CpuNum=`cat /proc/cpuinfo |grep 'processor'|wc -l`;
-RamTotal=`free -m | grep 'Mem' | awk '{print $2}'`;
-RamSwap=`free -m | grep 'Swap' | awk '{print $2}'`;
-RamSum=$[$RamTotal+$RamSwap];
-FileMax=`cat /proc/sys/fs/file-max`
-OSlimit=`ulimit -n`
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，
@@ -69,7 +51,7 @@ INSTALL_BASE_PACKAGES(){
 #调用INSTALL_BASE_PACKAGES给系统安装一些必要的工具
 #
 SYSTEM_BASE_PACKAGES(){
-	[ "$SysName" == 'centos' ] && BasePackages="wget crontabs iptables logrotate openssl expect" || BasePackages="ntp logrotate wget cron curl openssl expect"
+	[ "$SysName" == 'centos' ] && BasePackages="wget crontabs logrotate openssl expect" || BasePackages="ntp logrotate wget cron curl openssl expect"
 	INSTALL_BASE_PACKAGES $BasePackages
 }
 #system timezone set

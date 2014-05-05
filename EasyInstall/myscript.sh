@@ -2,8 +2,10 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear;
-
-ScriptPath=`pwd`
+#获取脚本路劲
+ScriptPath=$(cd $(dirname "$0") && pwd)
+source $ScriptPath/config
+#检测脚本文件是否存在并加载
 TEST_SCRIPT(){
 if [ ! -f "$ScriptPath/function/$1" ]; then
 	echo -e "not exist $ScriptPath/function/$1,so $0 can not be supported!"
