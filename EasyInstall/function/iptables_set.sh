@@ -24,6 +24,35 @@ IPTABLES_BASE_SET(){
 }
 
 IPTABLES_INPUT_SET(){
-	ETHERNET_CHECK
 	iptables -I INPUT 3 -p tcp -m multiport -dport $1 -j ACCEPT
 }
+
+IPTABLES_SET_CONFIG(){
+	InputPorts=""
+	InputPort=""
+	while true ;do
+		echo "For every input port and then press enter to enter another, input 'r' or 'R' reset input, input 'n' of 'N' exit"
+		read InputPort
+		case $InputPort in
+			[1-9][0-9]*)
+				if [ $InputPort -ge 65535 ];then
+					echo "the port number is illegal, please input again."
+				else
+					tmp=$InputPorts
+					[[ "$InputPorts" == '' ]] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
+				fi
+				continue
+				;;
+			n|N)
+				break;;
+			r|R)
+				InputPorts="";;
+			*)
+				echo "input is not number, please input again"
+		esac
+		echo "your port number is $InputPorts"
+	done
+	[[ "$InputPorts" == '' ]] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
+	echo "$InputPorts is setup in iptables"
+}
+ETHERNET_CHECK && IPTABLES_BASE_SET && IPTABLES_SET_CONFIG
