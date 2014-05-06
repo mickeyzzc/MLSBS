@@ -2,7 +2,7 @@
 #°²×°iptables,¼ì²âÍø¿¨
 ETHERNET_CHECK(){
 	INSTALL_BASE_PACKAGES iptables
-	Eths=${ifconfig|awk '!/^ |^$|lo/ {print $1}'}
+	Eths=`ifconfig|awk '!/^ |^$|lo/ {print $1}'`
 	if [ "$Eths" == '' ] ; then
 		echo "No effective ethernet , please setup the ethernet ."
 		exit 1
@@ -63,7 +63,7 @@ SELECT_IPTABLES_FUNCTION(){
 		case $var in
 			"Check iptables rules and status")
 				iptables -L -n -v
-				echo "input any key to exit"
+				echo "input enter to exit"
 				read ok
 				continue;;
 			"Setup iptables")
