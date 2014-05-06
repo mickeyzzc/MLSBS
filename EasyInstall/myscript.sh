@@ -34,11 +34,11 @@ SELECT_RUN_SCRIPT(){
 				TEST_SCRIPT mysql_install.sh
 				MYSQL_VAR && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
 			"Setup firewall")
-				if [ ${SysVer%%.*} -eq 3 -a ${SysVer%%.*} -le 12 -o "$SysVer" = "2.4" -o "$SysVer" = "2.6" -o "$SysVer" = "2.5" ];then
+				if [ ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -ge 13 ];then
+					echo "wait my script update";;
+				elif [ ${SysVer%%.*} -eq 2 -o ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -le 12 ];then
 					TEST_SCRIPT iptables_set.sh
-					SELECT_IPTABLES_FUNCTION
-				elif [ ${SysVer%%.*} -eq 3 -a ${SysVer%%.*} -ge 13 ];then
-					echo "wait my script update"
+					SELECT_IPTABLES_FUNCTION;;
 				else
 					echo "your system is no supported my firewall script"
 				fi;;
