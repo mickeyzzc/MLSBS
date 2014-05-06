@@ -59,7 +59,7 @@ IPTABLES_SET_PORT(){
 SELECT_IPTABLES_FUNCTION(){
 	clear;
 	echo "[Notice]How to set up iptables:"
-	select var in "Check iptables rules and status" "Setup iptables and set rules" "back";do
+	select var in "Check iptables rules and status" "Setup iptables" "Add rules" "back";do
 		case $var in
 			"Check iptables rules and status")
 				iptables -L -n -v;;
