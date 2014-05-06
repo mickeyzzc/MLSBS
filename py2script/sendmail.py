@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 def mailconfig():
     try:
         config=ConfigParser.ConfigParser()
-        with open('myconfig.conf','r') as cfgfile:
+        with open('myconfig.txt','r') as cfgfile:
             config.readfp(cfgfile)
             USERNAME=config.get('email','username')
             PASSWD=config.get('email','passwd')
@@ -14,7 +14,7 @@ def mailconfig():
             return (USERNAME,PASSWD,SMTP)
     except:
         print "no config"
-        return ("test@qq.com","test123","smtp.qq.com")
+        return ("test@ecardtek.com","ect123","smtp.exmail.qq.com")
         
 def mysendmail(mailist,subject,msg,filename=None):
     USERNAME,PASSWD,SMTP = mailconfig()

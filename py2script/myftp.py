@@ -3,6 +3,7 @@
 import sys,ftplib,os.path
 def ftp_connect(ftphost,ftpost,ftpname,ftpwd):
     myftp=ftplib.FTP()
+    myftp.set_pasv(1) if False else myftp.set_pasv(0)
     try:
         myftp.connect(ftphost,ftpost,10)
         print 'FTP connect is success.'
@@ -27,13 +28,18 @@ def l_r_diff(ftphost,ftpost,ftpname,ftpwd,remotedata,localdata):
         sys.exit()
     myftp=mftmp[1]
     rdata=splitpath(remotedata)
+    #myftp.retrlines("MLSD",None)
     myftp.cwd(rdata[0])
     rsize=0L
     lsize=0L
     try:
         rsize=myftp.size(rdata[1])
     except:
-        pass
+        myftp.voidcmd('TYPE I')
+        try:
+            rsize=myftp.size(rdata[1])
+        except:
+            pass
     if (rsize==None):
         rsize=0L
     if os.path.exists(localdata):
@@ -126,4 +132,4 @@ if __name__ == "__main__":
             print "DOWNLOAD OK"
         else:
             print "FTP TYPE IS ERROR"
-    mftp(options.ftp_type , options.ftp_host , options.ftp_post , options.ftp_user , options.ftp_password, options.localfile , options.remotefile)
+    mftp(options.ftp_type , options.ftp_host , options.ftp_post , options.ftp_user , options.ftp_password, options.remotefile, options.localfile)
