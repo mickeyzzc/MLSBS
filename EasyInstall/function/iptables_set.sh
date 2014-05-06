@@ -43,7 +43,7 @@ IPTABLES_SET_PORT(){
 					tmp=$InputPorts
 					[[ "$InputPorts" == '' ]] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
 				fi
-				continue;;
+				;;
 			n|N)
 				break;;
 			r|R)
@@ -55,6 +55,8 @@ IPTABLES_SET_PORT(){
 	done
 	[[ "$InputPorts" == '' ]] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
 	echo "$InputPorts is setup in iptables"
+	echo "input enter to exit"
+	read ok && continue
 }
 SELECT_IPTABLES_FUNCTION(){
 	clear;
