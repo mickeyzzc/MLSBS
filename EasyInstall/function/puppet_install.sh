@@ -6,7 +6,7 @@ PUPPET_VAR(){
 	PuppetVersion="puppet-3.4.2"
 	FacterVersion="facter-1.7.5"
 	RubyVersion="ruby-2.0.0-p353"
-	GitVersion="git-1.8.5.4"
+	#GitVersion="git-1.8.5.4"
 	OpenSSLVersion="openssl-1.0.1f"
 	ServerIp=""
 }

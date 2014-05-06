@@ -1,4 +1,9 @@
 #!/bin/bash
+PASS_ENTER_TO_EXIT(){
+	echo "input enter to exit"
+	read ok
+	continue
+}
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，

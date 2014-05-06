@@ -34,8 +34,14 @@ SELECT_RUN_SCRIPT(){
 				TEST_SCRIPT mysql_install.sh
 				MYSQL_VAR && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
 			"Setup firewall")
-				TEST_SCRIPT iptables_set.sh
-				SELECT_IPTABLES_FUNCTION;;
+				if [ (${SysVer%%.*} -eq 2 -a ${SysVer%%.*} -ge 4) -o (${SysVer%%.*} -eq 3 -a ${SysVer%%.*} -lt 13) ];then
+					TEST_SCRIPT iptables_set.sh
+					SELECT_IPTABLES_FUNCTION
+				elif [ ${SysVer%%.*} -eq 3 -a ${SysVer%%.*} -ge 13 ];then
+					echo "wait my script update"
+				else
+					echo "your system is no supported my firewall script"
+				fi;;
 			"Install Puppet")
 				TEST_SCRIPT puppet_install.sh
 				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;

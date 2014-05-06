@@ -11,22 +11,26 @@ ETHERNET_CHECK(){
 #iptables的基本设置和备份
 IPTABLES_BASE_SET(){
 	[ ! -d $ScriptPath/backup ] && mkdir $ScriptPath/backup
-	iptables-save > $ScriptPath/backup/iptables.up.rules.backup$(date +"%Y%m%d")
-	iptables -F
-	iptables -t nat -F
-	iptables -X
-	iptables -P INPUT DROP
-	iptables -P OUTPUT ACCEPT
-	iptables -P FORWARD ACCEPT
-	iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s --limit-burst 10 -j ACCEPT
-	iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-	iptables -A INPUT -i lo -j ACCEPT
-	iptables -A OUTPUT -o lo -j ACCEPT
-	iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+	for var in iptables ip6tables ; do
+		$var-save > $ScriptPath/backup/$var.up.rules.backup$(date +"%Y%m%d")
+		$var -F
+		$var -t nat -F
+		$var -X
+		$var -P INPUT DROP
+		$var -P OUTPUT ACCEPT
+		$var -P FORWARD ACCEPT
+		$var -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s --limit-burst 10 -j ACCEPT
+		$var -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		$var -A INPUT -i lo -j ACCEPT
+		$var -A OUTPUT -o lo -j ACCEPT
+		$var -A INPUT -p tcp --dport ssh -j ACCEPT
+	done
 }
 #增加放行端口的规则
 IPTABLES_INPUT_SET(){
-	iptables -A INPUT -p tcp -m multiport --dport $1 -j ACCEPT
+	for var in iptables ip6tables ; do
+		$var -A INPUT -p tcp -m multiport --dport $1 -j ACCEPT
+	done
 }
 #输入需要放行的有效的端口号
 IPTABLES_SET_PORT(){
@@ -55,8 +59,7 @@ IPTABLES_SET_PORT(){
 	done
 	[[ "$InputPorts" == '' ]] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
 	echo "$InputPorts is setup in iptables"
-	echo "input enter to exit"
-	read ok && continue
+	PASS_ENTER_TO_EXIT
 }
 SELECT_IPTABLES_FUNCTION(){
 	clear;
@@ -65,9 +68,8 @@ SELECT_IPTABLES_FUNCTION(){
 		case $var in
 			"Check iptables rules and status")
 				iptables -L -n -v
-				echo "input enter to exit"
-				read ok
-				continue;;
+				ip6tables -L -n -v
+				PASS_ENTER_TO_EXIT;;
 			"Setup iptables")
 				ETHERNET_CHECK && IPTABLES_BASE_SET;;
 			"Add rules")
