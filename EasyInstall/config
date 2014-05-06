@@ -16,3 +16,4 @@ RamSwap=`free -m | grep 'Swap' | awk '{print $2}'`;
 RamSum=$[$RamTotal+$RamSwap];
 FileMax=`cat /proc/sys/fs/file-max`
 OSlimit=`ulimit -n`
+SysVer=`uname -r|cut -d. -f1-2`

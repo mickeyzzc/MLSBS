@@ -20,7 +20,7 @@ SELECT_RUN_SCRIPT(){
 	clear;
 	TEST_SCRIPT system_base_set.sh
 	echo "[Notice] Which function you want to run:"
-	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Install Puppet" "Exit";do
+	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Setup firewall" "Install Puppet" "Exit";do
 		case $var in
 			"Initialize System")
 				SELECT_SYSTEM_BASE_FUNCTION;;
@@ -33,10 +33,9 @@ SELECT_RUN_SCRIPT(){
 			"Install Mysql")
 				TEST_SCRIPT mysql_install.sh
 				MYSQL_VAR && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
-			# "Install nginx and tomcat and mysql")
-				# TEST_SCRIPT nginx_tomcat_install.sh
-				# TEST_SCRIPT mysql_install.sh
-				# NGINX_VAR && MYSQL_VAR && SELECT_NGINX_TOMCAT_FUNCTION && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
+			"Setup firewall")
+				TEST_SCRIPT iptables_set.sh
+				SELECT_IPTABLES_FUNCTION;;
 			"Install Puppet")
 				TEST_SCRIPT puppet_install.sh
 				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;

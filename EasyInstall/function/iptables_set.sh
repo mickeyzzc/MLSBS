@@ -1,8 +1,7 @@
 #!/bin/bash
-#安装iptables
-INSTALL_BASE_PACKAGES iptables
-#检测网卡
+#安装iptables,检测网卡
 ETHERNET_CHECK(){
+	INSTALL_BASE_PACKAGES iptables
 	Eths=${ifconfig|awk '!/^ |^$|lo/ {print $1}'}
 	if [ "$Eths" == '' ] ; then
 		echo "No effective ethernet , please setup the ethernet ."
@@ -16,18 +15,21 @@ IPTABLES_BASE_SET(){
 	iptables -F
 	iptables -t nat -F
 	iptables -X
-	iptables -t nat -X
+	iptables -P INPUT DROP
+	iptables -P OUTPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s --limit-burst 10 -j ACCEPT
 	iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 	iptables -A INPUT -i lo -j ACCEPT
+	iptables -A OUTPUT -o lo -j ACCEPT
 	iptables -A INPUT -p tcp --dport ssh -j ACCEPT
-	iptables -A INPUT -j DROP
 }
 #增加放行端口的规则
 IPTABLES_INPUT_SET(){
-	iptables -I INPUT 3 -p tcp -m multiport -dport $1 -j ACCEPT
+	iptables -A INPUT -p tcp -m multiport -dport $1 -j ACCEPT
 }
 #输入需要放行的有效的端口号
-IPTABLES_SET_CONFIG(){
+IPTABLES_SET_PORT(){
 	InputPorts=""
 	InputPort=""
 	while true ;do
@@ -41,8 +43,7 @@ IPTABLES_SET_CONFIG(){
 					tmp=$InputPorts
 					[[ "$InputPorts" == '' ]] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
 				fi
-				continue
-				;;
+				continue;;
 			n|N)
 				break;;
 			r|R)
@@ -55,4 +56,22 @@ IPTABLES_SET_CONFIG(){
 	[[ "$InputPorts" == '' ]] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
 	echo "$InputPorts is setup in iptables"
 }
-ETHERNET_CHECK && IPTABLES_BASE_SET && IPTABLES_SET_CONFIG
+SELECT_IPTABLES_FUNCTION(){
+	clear;
+	echo "[Notice]How to set up iptables:"
+	select var in "Check iptables rules and status" "Setup iptables and set rules" "back";do
+		case $var in
+			"Check iptables rules and status")
+				iptables -L -n -v;;
+			"Setup iptables")
+				ETHERNET_CHECK && IPTABLES_BASE_SET;;
+			"Add rules")
+				IPTABLES_SET_PORT;;
+			"back")
+				SELECT_RUN_SCRIPT;;
+			*)
+				SELECT_IPTABLES_FUNCTION;;
+		esac
+		break
+	done
+}

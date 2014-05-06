@@ -106,7 +106,7 @@ EOF
 #main
 SELECT_PUPPET_FUNCTION(){
 	clear;
-	echo "[Notice] Which system_base_function you want to run:"
+	echo "[Notice] How to set up puppet:"
 	select var in "Puppet server install" "Puppet client install" "back";do
 		case $var in
 			"Puppet server install")
