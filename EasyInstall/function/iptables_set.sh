@@ -26,7 +26,7 @@ IPTABLES_BASE_SET(){
 }
 #增加放行端口的规则
 IPTABLES_INPUT_SET(){
-	iptables -A INPUT -p tcp -m multiport -dport $1 -j ACCEPT
+	iptables -A INPUT -p tcp -m multiport --dport $1 -j ACCEPT
 }
 #输入需要放行的有效的端口号
 IPTABLES_SET_PORT(){
