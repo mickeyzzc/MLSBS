@@ -62,7 +62,10 @@ SELECT_IPTABLES_FUNCTION(){
 	select var in "Check iptables rules and status" "Setup iptables" "Add rules" "back";do
 		case $var in
 			"Check iptables rules and status")
-				iptables -L -n -v;;
+				iptables -L -n -v
+				echo "input any key to exit"
+				read ok
+				continue;;
 			"Setup iptables")
 				ETHERNET_CHECK && IPTABLES_BASE_SET;;
 			"Add rules")
