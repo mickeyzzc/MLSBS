@@ -6,9 +6,8 @@ PUPPET_VAR(){
 	PuppetVersion="puppet-3.4.2"
 	FacterVersion="facter-1.7.5"
 	RubyVersion="ruby-2.0.0-p353"
-	#GitVersion="git-1.8.5.4"
 	OpenSSLVersion="openssl-1.0.1f"
-	ServerIp=""
+	PupetServerIp=""
 }
 #install ruby
 RUBY_INSTALL(){
@@ -26,15 +25,7 @@ RUBY_INSTALL(){
 	./configure --with-openssl-dir=/usr/local/ssl --enable-shared &&
 	make && make install
 }
-#install git
-# GIT_INSTALL(){
-	# cd /tmp
-	# [ ! -f $GitVersion.tar.gz ] && curl -O https://git-core.googlecode.com/files/$GitVersion.tar.gz
-	# tar zxf $GitVersion.tar.gz
-	# cd /tmp/$GitVersion
-	# ./configure
-	# make && make install
-# }
+
 #install puppet's base packages
 PUPPET_BASE_PACKAGES_INSTALL(){
 	#install base packages
@@ -44,10 +35,10 @@ PUPPET_BASE_PACKAGES_INSTALL(){
 	ruby -v && RubyOldVersion=`ruby -v |awk '{printf "%s\n",$2}'` 
 	[[ "$RubyOldVersion" == '' ]] && RUBY_INSTALL
 	#set system hostname
-	[[ "$PuppetServer" == '' ]] && echo "Please input PuppetServer's name:";read PuppetServer
-	[[ "$ServerIp" == '' ]] && echo "Please input PuppetServer's IP:";read ServerIp
+	[[ "$PuppetServer" == '' ]] && read -p "Please input PuppetServer's name:" PuppetServer
+	[[ "$PupetServerIp" == '' ]] && read -p "Please input PuppetServer's IP:" PupetServerIp
 	HostSet=`grep '$PuppetServer' /etc/hosts`
-	[[ "$HostSet" == "" ]] && echo "$ServerIp $PuppetServer" >> /etc/hosts || sed -i "s/$HostSet/$ServerIp $PuppetServer/g" /etc/hosts
+	[[ "$HostSet" == "" ]] && echo "$PupetServerIp $PuppetServer" >> /etc/hosts || sed -i "s/$HostSet/$PupetServerIp $PuppetServer/g" /etc/hosts
 	#call other funtion to set system timezone
 	TIMEZONE_SET
 	#[ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;

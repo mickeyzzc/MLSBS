@@ -9,7 +9,7 @@ MYSQL_VAR(){
 	MysqlLogPath="/var/log/mysql"
 	MysqlConfigPath="$MysqlPath"
 	MysqlPass=""
-	[[ "$MysqlPass" == '' ]] && echo "Please input MYSQL's password:";read MysqlPass
+	[[ "$MysqlPass" == '' ]] && read -p "Please input MYSQL's password:" MysqlPass
 }
 MYSQL_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then

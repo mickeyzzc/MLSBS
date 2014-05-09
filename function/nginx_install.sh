@@ -1,12 +1,11 @@
 #!/bin/bash
 
 NGINX_VAR(){
-	TomcatVersion=""
 	NginxVersion="nginx-1.4.5"
 	NginxPath="/usr/local/nginx"
 	ServerIP=""
 	ServerHostName=""
-	[[ "$ServerHostName" == '' ]] && echo "Please input domain name:";read ServerHostName
+	[[ "$ServerHostName" == '' ]] && read -p "Please input domain name:" ServerHostName
 }
 NGINX_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
@@ -85,11 +84,11 @@ EOF
 SELECT_NGINX_FUNCTION(){
 	clear;
 	echo "[Notice] Which tomcat's version you want to install:"
-	select var in "with localhost's tomcat" "without localhost's tomcat7" "back";do
+	select var in "with localhost's tomcat" "without localhost's tomcat" "back";do
 		case $var in
 			"with localhost's tomcat")
 				ServerIP="127.0.0.1";;
-			"without localhost's tomcat7" )
+			"without localhost's tomcat" )
 				echo "Please input proxy tomcat's ip:";read ServerIP;;
 			"back")
 				SELECT_RUN_SCRIPT;;

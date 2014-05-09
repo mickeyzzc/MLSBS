@@ -1,7 +1,7 @@
 #!/bin/bash
 PASS_ENTER_TO_EXIT(){
-	echo "input enter to exit"
-	read ok
+	echo 
+	read -p "input enter to exit" -t 60 ok
 	continue
 }
 #add system's administrator
@@ -11,8 +11,8 @@ PASS_ENTER_TO_EXIT(){
 ADMINUSER_ADD(){
 	AdminUser=""
 	AdminPwd=""
-	[[ "$AdminUser" == '' ]] && echo "Please input AdminUser's name:";read AdminUser
-	[[ "$AdminPwd" == '' ]] && echo "Please input AdminUser's password:";read AdminPwd
+	[[ "$AdminUser" == '' ]] && read -p "Please input AdminUser's name:" AdminUser
+	[[ "$AdminPwd" == '' ]] && read -p "Please input AdminUser's password:" AdminPwd
 	useradd -G sudo -d /home/$AdminUser -m -N -s /bin/bash $AdminUser
 	echo $AdminUser:"$AdminPwd" |chpasswd
 }
