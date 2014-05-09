@@ -1,8 +1,6 @@
 #!/bin/bash
 PASS_ENTER_TO_EXIT(){
-	echo 
 	read -p "input enter to exit" -t 60 ok
-	continue
 }
 #add system's administrator
 #
