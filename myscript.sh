@@ -16,6 +16,9 @@ else
 	source $1
 fi
 }
+TEST_FILE(){
+	[ -f $1 ] && echo "Not exist $1";break || echo "loading $1 now"
+}
 #main
 SELECT_RUN_SCRIPT(){
 	clear;
