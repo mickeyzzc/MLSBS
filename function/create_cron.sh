@@ -6,18 +6,18 @@ CronUser=""
 CronTime=""
 [ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 CRON_CREATE(){
-	grep "$1 $2 $3" /etc/crontab > /dev/null
-	[ $? -gt 0 ] && echo "$1 $2 $3" >> /etc/crontab || echo "Nothing has be created"
+	grep "$1" /etc/crontab > /dev/null
+	[ $? -gt 0 ] && echo "Nothing has be created" || echo "$1" >> /etc/crontab
 }
 CRON_FOR_SSHDENY(){
 	TEST_FILE $BashTemplatePath/ssh_backlist_deny.sh
 	TEST_FILE $AuthLog
-	cp $BashTemplatePath/ssh_backlist_deny.sh $MyCronBashPath/ssh_backlist_deny.sh
-	sed -i 's/var[1]/$AuthLog/g' $MyCronBashPath/ssh_backlist_deny.sh
-	CronTime="00 5    * * *"
+	AuthLogTmp=$(echo $AuthLog|sed 's/\//\\\//g')
+	cat $BashTemplatePath/ssh_backlist_deny.sh|sed "s/var\[1\]/$AuthLogTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
 	CronUser="root"
+	CronTime='00 5    * * *'
 	CronCmd="bash $MyCronBashPath/ssh_backlist_deny.sh"
-	CRON_CREATE $CronTime $CronUser $CronCmd
+	CRON_CREATE "$CronTime	$CronUser	$CronCmd"
 }
 SELECT_CRON_FUNCTION(){
 	clear;
@@ -25,7 +25,8 @@ SELECT_CRON_FUNCTION(){
 	select var in "ssh blacklist deny" "back";do
 		case $var in
 			"ssh blacklist deny")
-				CRON_FOR_SSHDENY;;
+				CRON_FOR_SSHDENY
+				PASS_ENTER_TO_EXIT;;
 			"back")
 				SELECT_RUN_SCRIPT;;
 			*)
