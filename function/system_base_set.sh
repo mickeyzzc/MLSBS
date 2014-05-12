@@ -3,7 +3,7 @@ PASS_ENTER_TO_EXIT(){
 	read -p "input enter to exit" -t 60 ok
 }
 TEST_FILE(){
-	if [ -f $1 ];then
+	if [ ! -f $1 ];then
 		echo "Not exist $1"
 		PASS_ENTER_TO_EXIT
 		SELECT_RUN_SCRIPT
