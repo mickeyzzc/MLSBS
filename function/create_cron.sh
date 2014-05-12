@@ -6,8 +6,8 @@ CronUser=""
 CronTime=""
 [ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 CRON_CREATE(){
-	grep "$1" /etc/crontab > /dev/null
-	[ $? -gt 0 ] && echo "Nothing has be created" || echo "$1" >> /etc/crontab
+	grep "$CronCmd" /etc/crontab > /dev/null
+	[ $? -gt 0 ] && echo -e "$1" >> /etc/crontab || echo "Nothing has be created"
 }
 CRON_FOR_SSHDENY(){
 	TEST_FILE $BashTemplatePath/ssh_backlist_deny.sh
@@ -17,7 +17,7 @@ CRON_FOR_SSHDENY(){
 	CronUser="root"
 	CronTime='00 5    * * *'
 	CronCmd="bash $MyCronBashPath/ssh_backlist_deny.sh"
-	CRON_CREATE "$CronTime	$CronUser	$CronCmd"
+	CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
 }
 SELECT_CRON_FUNCTION(){
 	clear;
