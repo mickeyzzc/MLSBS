@@ -19,3 +19,18 @@ CRON_FOR_SSHDENY(){
 	CronCmd="bash $MyCronBashPath/ssh_backlist_deny.sh"
 	CRON_CREATE $CronTime $CronUser $CronCmd
 }
+SELECT_CRON_FUNCTION(){
+	clear;
+	echo "[Notice] Which cron_function you want to run:"
+	select var in "ssh blacklist deny" "back";do
+		case $var in
+			"ssh blacklist deny")
+				CRON_FOR_SSHDENY
+			"back")
+				SELECT_RUN_SCRIPT;;
+			*)
+				SELECT_SYSTEM_BASE_FUNCTION;;
+		esac
+		break
+	done
+}

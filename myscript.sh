@@ -21,7 +21,7 @@ SELECT_RUN_SCRIPT(){
 	clear;
 	SOURCE_SCRIPT $FunctionPath/system_base_set.sh
 	echo "[Notice] Which function you want to run:"
-	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Setup firewall" "Install Puppet" "Exit";do
+	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Setup firewall" "Install Puppet" "create cron" "Exit";do
 		case $var in
 			"Initialize System")
 				SELECT_SYSTEM_BASE_FUNCTION;;
@@ -46,6 +46,9 @@ SELECT_RUN_SCRIPT(){
 			"Install Puppet")
 				SOURCE_SCRIPT $FunctionPath/puppet_install.sh
 				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;
+			"create cron")
+				SOURCE_SCRIPT $FunctionPath/create_cron.sh
+				SELECT_CRON_FUNCTION;;
 			"Exit")
 				exit 0;;
 			*)
