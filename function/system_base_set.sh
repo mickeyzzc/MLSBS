@@ -2,6 +2,15 @@
 PASS_ENTER_TO_EXIT(){
 	read -p "input enter to exit" -t 60 ok
 }
+TEST_FILE(){
+	if [ -f $1 ];then
+		echo "Not exist $1"
+		PASS_ENTER_TO_EXIT
+		SELECT_RUN_SCRIPT
+	else
+		echo "loading $1 now..."
+	fi
+}
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，

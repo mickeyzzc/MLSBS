@@ -1,10 +1,10 @@
 #!/bin/env bash
-##########################################################################
+#########################################################################
 # NOTE:
 # The test system is Ubuntu12.04
 # This Scripts all rights reserved deserved by MickeyZZC
 # Copyright  2013
-##########################################################################
+#########################################################################
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear
