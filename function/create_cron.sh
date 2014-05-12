@@ -25,7 +25,7 @@ SELECT_CRON_FUNCTION(){
 	select var in "ssh blacklist deny" "back";do
 		case $var in
 			"ssh blacklist deny")
-				CRON_FOR_SSHDENY
+				CRON_FOR_SSHDENY;;
 			"back")
 				SELECT_RUN_SCRIPT;;
 			*)
