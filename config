@@ -20,5 +20,5 @@ SysVer=`uname -r|cut -d. -f1-2`
 
 #½Å±¾²ÎÊý
 FunctionPath="$ScriptPath/function"
-BashTemplatePath="$ScriptPath/bashTemplatePath"
+BashTemplatePath="$ScriptPath/bashTemplate"
 MyCronBashPath="/usr/local/mybash"
