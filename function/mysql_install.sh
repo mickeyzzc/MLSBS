@@ -73,7 +73,7 @@ long_query_time	= 3
 log_bin	= $MysqlLogPath/mysql-bin
 log_bin_index	= $MysqlLogPath/mysql-bin.index
 expire_logs_days	= 7
-max_binlog_size	= `expr $(df -m $MysqlLogPath |awk 'NR==2{printf "%s\n",$4}') / 10000`M
+max_binlog_size	= `expr $(df -m $MysqlLogPath |awk 'NR==2{printf "%s\n",$4}') / 1000`M
 default_storage_engine	= InnoDB
 innodb_buffer_pool_size	= `expr $RamTotal / 100`M
 innodb_log_buffer_size	= 8M
@@ -101,11 +101,8 @@ cat > /etc/ld.so.conf.d/mysql.conf<<EOF
 EOF
 # **************************************
 	ldconfig;
-	if [ "$SysBit" == '64' ] ; then
-		ln -s $MysqlPath/lib/mysql /usr/lib64/mysql;
-	else
-		ln -s $MysqlPath/lib/mysql /usr/lib/mysql;
-	fi;
+	[ "$SysBit" == '64' ] && ln -s $MysqlPath/lib/mysql /usr/lib64/mysql
+	[ $? -gt 0 ] && ln -s $MysqlPath/lib/mysql /usr/lib/mysql
 	cp $MysqlPath/support-files/mysql.server /etc/init.d/mysqld;
 	chmod 775 /etc/init.d/mysqld;
 	/etc/init.d/mysqld start;

@@ -20,7 +20,7 @@ CRON_FOR_SSHDENY(){
 	CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
 }
 CRON_FOR_MYSQL_SERVER(){
-	if [[ `which mysqldump`=="" -o `which mysql`=="" ]];then
+	if [ a`which mysqldump`=="a" -o e`which mysql`=="e" ];then
 		read -p "Your system is not supported this task" -t 30 ok
 	else
 		TEST_FILE $BashTemplatePath/mysql_server.sh
