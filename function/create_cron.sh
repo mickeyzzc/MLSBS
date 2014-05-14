@@ -20,7 +20,7 @@ CRON_FOR_SSHDENY(){
 	CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
 }
 CRON_FOR_MYSQL_SERVER(){
-	if [ a`which mysqldump`=="a" -o e`which mysql`=="e" ];then
+	if [ e`which mysqldump` == "e" -o a`which mysql` == "a" ];then
 		read -p "Your system is not supported this task" -t 30 ok
 	else
 		TEST_FILE $BashTemplatePath/mysql_server.sh
@@ -30,7 +30,7 @@ CRON_FOR_MYSQL_SERVER(){
 			read -p "Please input mysql server's password:" MysqlPwd
 			#read -p "Whice is the backup directory :" MysqlBackupPath
 			mysql -h$MysqlHost -u$MysqlUser -p$MysqlPwd -e"show databases" 2>&1 >>/dev/null
-			[ $? -gt 0 ] && break || echo "input err, please input again!"
+			[ $? -gt 0 ] && echo "input err, please input again!" || break
 		done
 		cat $BashTemplatePath/mysql_server.sh |sed -e "s/MysqlUser=/MysqlUser=$MysqlUser/g" -e "s/MysqlPwd=/MysqlPwd=$MysqlPwd/g" -e "s/MysqlHost=/MysqlHost=$MysqlHost/g" > $MyCronBashPath/mysql_server.sh
 		chown 700 $MyCronBashPath/mysql_server.sh
