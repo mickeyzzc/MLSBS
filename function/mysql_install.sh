@@ -109,8 +109,9 @@ EOF
 	cp $MysqlPath/support-files/mysql.server /etc/init.d/mysqld;
 	chmod 775 /etc/init.d/mysqld;
 	/etc/init.d/mysqld start;
-	ln -s $MysqlPath/bin/mysql /usr/bin/mysql;
-	ln -s $MysqlPath/bin/mysqladmin /usr/bin/mysqladmin;
+	for i in mysql mysqladmin mysqlcheck mysqldump;do
+		ln -s $MysqlPath/bin/$i /usr/bin/$i;
+	done
 	$MysqlPath/bin/mysqladmin password $MysqlPass;
 	rm -rf $MysqlDataPath/test;
 # EOF **********************************
