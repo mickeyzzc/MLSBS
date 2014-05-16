@@ -1,6 +1,6 @@
 #!/bin/bash
 PASS_ENTER_TO_EXIT(){
-	read -p "input enter to exit" -t 60 ok
+	read -p "input enter to exit" -t 30 ok
 }
 TEST_FILE(){
 	if [ ! -f $1 ];then
@@ -55,7 +55,8 @@ INSTALL_BASE_PACKAGES(){
 		[[ "$SysCount" == '' ]] && apt-get update && SysCount="1"
 		for arg do
 			echo "[${arg} Installing] ************************************************** >>";
-			apt-get install -y $arg --force-yes;apt-get -fy install;apt-get -y autoremove; 
+			apt-get install -y $arg --force-yes;apt-get -fy install;apt-get -y autoremove --purge;
+			dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
 		done;
 	fi;
 }

@@ -14,7 +14,7 @@ def mailconfig():
             return (USERNAME,PASSWD,SMTP)
     except:
         print "no config"
-        return ("test@ecardtek.com","ect123","smtp.exmail.qq.com")
+        return ("test@qq.com","test123","smtp.qq.com")
         
 def mysendmail(mailist,subject,msg,filename=None):
     USERNAME,PASSWD,SMTP = mailconfig()
@@ -49,7 +49,7 @@ def mysendmail(mailist,subject,msg,filename=None):
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser()
-    parser.add_option("-t","--to",dest="MAIL_LIST",default='mickeyzheng@ecardtek.com',help="Send to someone")
+    parser.add_option("-t","--to",dest="MAIL_LIST",default='mickey_zzc@126.com',help="Send to someone")
     parser.add_option("-s","--subject",dest="subject",default='Test Mail',help="Subject of Mail")
     parser.add_option("-m","--msg",dest="msg",default='Test Mail Message',help="Text")
     parser.add_option("-f","--file",dest="filename",default=None,help="File")

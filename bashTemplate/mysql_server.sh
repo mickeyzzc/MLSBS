@@ -13,17 +13,18 @@ MysqlUser=
 MysqlPwd=
 MysqlHost=
 MysqlBackupPath=/usr/local/mysqlbackup
-
+MyBashLogPath="/var/log/mybash"
+[ ! -d $MyBashLogPath ] && mkdir -p $MyBashLogPath
 #MYSQL存活状态检测
 MYSQL_ALIVE(){
 	Num=0
 	while [[ `pidof mysqld` == "" ]] ; do
-		echo "$(date +%Y%m%d%H%M),MYSQL IS DOWN" >> /var/log/mysqlstat.log
+		echo "$(date +%Y%m%d%H%M),MYSQL IS DOWN" >> $MyBashLogPath/mysqlstat.log
 		MysqlServer=$(ls /etc/init.d |grep mysql)
 		/etc/init.d/$MysqlServer start
 		Num=`expr $Num + 1`
 			if [ $Num -gt 11 ] ; then
-				echo "$(date +%Y%m%d%H%M),MYSQL NO UP" >> /var/log/mysqlstat.log
+				echo "$(date +%Y%m%d%H%M),MYSQL NO UP" >> $MyBashLogPath/mysqlstat.log
 				exit 1
 			fi
 		sleep 10
@@ -43,12 +44,12 @@ MYSQL_SAMCHK(){
 				TableStatus=`mysql -h$MysqlHost -u$MysqlUser -p$MysqlPwd -e"check table $i.$j"|awk 'BEGIN{IFS='\t'}{print $3}'|grep "error"`
 				if [[ ! "$TableStatus" == "" ]] ; then
 					mysql -h$MysqlHost -u$MysqlUser -p$MysqlPwd -e"repair table $i.$j"
-					echo "$(date +%Y%m%d%H%M),$i.$j be repair" >> /var/log/mysqlstat.log
+					echo "$(date +%Y%m%d%H%M),$i.$j be repair" >> $MyBashLogPath/mysqlstat.log
 				fi
 			done
 		done
 	else
-		mysqlcheck --all-databases --auto-repair -u$MysqlUser -p$MysqlPwd |awk '!/OK/ {printf "datetime,%s\n",$1}'|sed "s/datetime/$(date +%Y%m%d%H%M)/g" >> /var/log/mysqlstat.log
+		mysqlcheck --all-databases --auto-repair -u$MysqlUser -p$MysqlPwd |awk '!/OK/ {printf "datetime,%s\n",$1}'|sed "s/datetime/$(date +%Y%m%d%H%M)/g" >> $MyBashLogPath/mysqlstat.log
 	fi
 }
 #备份数据库

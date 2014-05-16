@@ -36,7 +36,7 @@ SELECT_RUN_SCRIPT(){
 				MYSQL_VAR && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
 			"Setup firewall")
 				if [ ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -ge 13 ];then
-					echo "wait my script update"
+					read -p "wait my script update" -t 5 ok
 				elif [ ${SysVer%%.*} -eq 2 -o ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -le 12 ];then
 					SOURCE_SCRIPT $FunctionPath/iptables_set.sh
 					SELECT_IPTABLES_FUNCTION

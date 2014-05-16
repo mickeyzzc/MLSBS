@@ -111,5 +111,5 @@ SELECT_PUPPET_FUNCTION(){
 		esac
 		break
 	done
-	[[ "$PuppetApplication" != '' ]] && && PUPPET_SOURCE_INSTALL && PUPPET_SET
+	[[ "$PuppetApplication" != '' ]] && PUPPET_SOURCE_INSTALL && PUPPET_SET
 }
