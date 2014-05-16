@@ -47,7 +47,7 @@ CRON_FOR_SYSTEM_CHECK(){
 	TEST_FILE $Python2Path/pyconfig.conf
 	cp $Python2Path/sendmail.py $Python2Path/pyconfig.conf $MyCronBashPath/
 	chown 700 $MyCronBashPath/sendmail.py
-	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $Python2Path/sendmail.py|sed 's/\//\\\//g')/g" > $MyCronBashPath/system_check.sh
+	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" > $MyCronBashPath/system_check.sh
 	CronUser="root"
 	CronTime='10 1    * * *'
 	CronCmd="bash $MyCronBashPath/system_check.sh hdd"
@@ -56,12 +56,14 @@ CRON_FOR_SYSTEM_CHECK(){
 SELECT_CRON_FUNCTION(){
 	clear;
 	echo "[Notice] Which cron_function you want to run:"
-	select var in "ssh blacklist deny" "backup mysql's datebases" "back";do
+	select var in "ssh blacklist deny" "backup mysql's datebases" "check system" "back";do
 		case $var in
 			"ssh blacklist deny")
 				CRON_FOR_SSHDENY;;
 			"backup mysql's datebases")
 				CRON_FOR_MYSQL_SERVER;;
+			"check system")
+				CRON_FOR_SYSTEM_CHECK;;
 			"back")
 				SELECT_RUN_SCRIPT;;
 			*)
