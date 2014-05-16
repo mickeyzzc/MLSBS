@@ -8,9 +8,9 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear
-MyBashLogPath="/var/log/mybash"
-MailTool=""
-MsgDate=$(date -d "yesterday" +"%Y%m%d")
+MyBashLogPath=
+MailTool=
+MsgAccessory=
 [ ! -d $MyBashLogPath ] && mkdir -p $MyBashLogPath
 BIG_FILE(){
 	find $1 -type f -size +$2 -mtime $3 -mtime -$4 -exec stat -c "%s,%n" {} \;
@@ -23,14 +23,18 @@ HDD_CHECK(){
 		BIG_FILE $i 200M 2 7 >> $MyBashLogPath/hdd$(date +"%Y%m%d").log
 		BIG_FILE $i 500M 7 60 >> $MyBashLogPath/hdd$(date +"%Y%m%d").log
 	done
+	MsgTitle="$(date -d "yesterday" +"%Y%m%d"), HDD Warning Mail"
+	MsgHtml=$(cat $MyBashLogPath/hdd$(date +"%Y%m%d").log |sed 's/$/\<br\>/g')
+	MY_MAIL $MsgTitle $MsgHtml
 }
 MY_MAIL(){
-	MailReceiver=""
-	MsgTitle=$1
-	MsgHtml=$2
-	MsgAccessory=$3
-	[[ "$MsgAccessory" == "" ]] && python $MailTool -s $MsgTitle -m $MsgHtml -t $MailReceiver
-	
+	MailReceiver=
+	[[ "$3" == "" ]] && python $MailTool -s $1 -m $2 -t $MailReceiver || python $MailTool -s $1 -m $2 -f $3 -t $MailReceiver
 }
-
+case $1 in
+'hdd')
+	HDD_CHECK;;
+*)
+	HDD_CHECK;;
+esac
 

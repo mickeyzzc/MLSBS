@@ -13,7 +13,7 @@ MysqlUser=
 MysqlPwd=
 MysqlHost=
 MysqlBackupPath=/usr/local/mysqlbackup
-MyBashLogPath="/var/log/mybash"
+MyBashLogPath=
 [ ! -d $MyBashLogPath ] && mkdir -p $MyBashLogPath
 #MYSQL存活状态检测
 MYSQL_ALIVE(){
