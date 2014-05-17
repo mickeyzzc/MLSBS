@@ -23,9 +23,13 @@ HDD_CHECK(){
 		BIG_FILE $i 200M 2 7 >> $MyBashLogPath/hdd$(date +"%Y%m%d").log
 		BIG_FILE $i 500M 7 60 >> $MyBashLogPath/hdd$(date +"%Y%m%d").log
 	done
-	MsgTitle="$(date -d "yesterday" +"%Y%m%d"), HDD Warning Mail"
-	MsgHtml=$(cat $MyBashLogPath/hdd$(date +"%Y%m%d").log |sed 's/$/\<br\>/g')
-	MY_MAIL $MsgTitle $MsgHtml
+	if [ -f $MyBashLogPath/hdd$(date +"%Y%m%d").log ];then
+		MsgTitle="$(date -d "yesterday" +"%Y%m%d"), HDD Warning Mail"
+		MsgHtml=$(cat $MyBashLogPath/hdd$(date +"%Y%m%d").log |sed 's/$/\<br\>/g')
+		MY_MAIL $MsgTitle $MsgHtml
+	else
+		read -p "NO log to loading .... 10s to exit!" -t 10 ok
+	fi
 }
 MY_MAIL(){
 	MailReceiver=

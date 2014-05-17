@@ -47,7 +47,8 @@ CRON_FOR_SYSTEM_CHECK(){
 	TEST_FILE $Python2Path/pyconfig.conf
 	cp $Python2Path/sendmail.py $Python2Path/pyconfig.conf $MyCronBashPath/
 	chown 700 $MyCronBashPath/sendmail.py
-	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" > $MyCronBashPath/system_check.sh
+	read -p "Input mail address :" MsgAccessory
+	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" -e "s/MsgAccessory=/MsgAccessory=$MsgAccessory/g" > $MyCronBashPath/system_check.sh
 	CronUser="root"
 	CronTime='10 1    * * *'
 	CronCmd="bash $MyCronBashPath/system_check.sh hdd"
