@@ -3,7 +3,7 @@
 ETHERNET_CHECK(){
 	INSTALL_BASE_PACKAGES iptables
 	Eths=`ifconfig|awk '!/^ |^$|lo/ {print $1}'`
-	if [ "$Eths" == '' ] ; then
+	if [ -z $Eths ] ; then
 		echo "No effective ethernet , please setup the ethernet ."
 		exit 1
 	fi
@@ -45,7 +45,7 @@ IPTABLES_SET_PORT(){
 					echo "the port number is illegal, please input again."
 				else
 					tmp=$InputPorts
-					[[ "$InputPorts" == '' ]] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
+					[ -z "$InputPorts" ] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
 				fi
 				;;
 			n|N)
@@ -57,7 +57,7 @@ IPTABLES_SET_PORT(){
 		esac
 		echo "your port number is $InputPorts"
 	done
-	[[ "$InputPorts" == '' ]] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
+	[ -z $InputPorts ] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
 	echo "$InputPorts is setup in iptables"
 	PASS_ENTER_TO_EXIT
 }

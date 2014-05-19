@@ -5,7 +5,7 @@ NGINX_VAR(){
 	NginxPath="/usr/local/nginx"
 	ServerIP=""
 	ServerHostName=""
-	[[ "$ServerHostName" == '' ]] && read -p "Please input domain name:" ServerHostName
+	[ -z $ServerHostName ] && read -p "Please input domain name:" ServerHostName
 }
 NGINX_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
@@ -97,5 +97,5 @@ SELECT_NGINX_FUNCTION(){
 		esac
 		break
 	done
-	[[ "$ServerIP" != '' ]] && NGINX_INSTALL && NGINX_CONF_SET
+	[ -n $ServerIP ] && NGINX_INSTALL && NGINX_CONF_SET
 }

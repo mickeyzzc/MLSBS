@@ -33,12 +33,12 @@ PUPPET_BASE_PACKAGES_INSTALL(){
 	INSTALL_BASE_PACKAGES $BasePackages
 	#check ruby install
 	ruby -v && RubyOldVersion=`ruby -v |awk '{printf "%s\n",$2}'` 
-	[[ "$RubyOldVersion" == '' ]] && RUBY_INSTALL
+	[ -z $RubyOldVersion ] && RUBY_INSTALL
 	#set system hostname
-	[[ "$PuppetServer" == '' ]] && read -p "Please input PuppetServer's name:" PuppetServer
-	[[ "$PupetServerIp" == '' ]] && read -p "Please input PuppetServer's IP:" PupetServerIp
+	[ -z $PuppetServer ] && read -p "Please input PuppetServer's name:" PuppetServer
+	[ -z $PupetServerIp ] && read -p "Please input PuppetServer's IP:" PupetServerIp
 	HostSet=`grep '$PuppetServer' /etc/hosts`
-	[[ "$HostSet" == "" ]] && echo "$PupetServerIp $PuppetServer" >> /etc/hosts || sed -i "s/$HostSet/$PupetServerIp $PuppetServer/g" /etc/hosts
+	[ -z $HostSet ] && echo "$PupetServerIp $PuppetServer" >> /etc/hosts || sed -i "s/$HostSet/$PupetServerIp $PuppetServer/g" /etc/hosts
 	#call other funtion to set system timezone
 	TIMEZONE_SET
 	#[ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
@@ -111,5 +111,5 @@ SELECT_PUPPET_FUNCTION(){
 		esac
 		break
 	done
-	[[ "$PuppetApplication" != '' ]] && PUPPET_SOURCE_INSTALL && PUPPET_SET
+	[ -n $PuppetApplication ] && PUPPET_SOURCE_INSTALL && PUPPET_SET
 }

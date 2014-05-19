@@ -11,6 +11,16 @@ TEST_FILE(){
 		echo "loading $1 now..."
 	fi
 }
+TEST_PROGRAMS(){
+	for arg do
+		if [ -z $(which $arg) ];then
+			read -p "Your system do not have $arg" -t 10 ok
+			return 0
+		else
+			read -p "loading $arg ..." -t 1 ok
+		fi
+	done
+}
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，
@@ -18,8 +28,8 @@ TEST_FILE(){
 ADMINUSER_ADD(){
 	AdminUser=""
 	AdminPwd=""
-	[[ "$AdminUser" == '' ]] && read -p "Please input AdminUser's name:" AdminUser
-	[[ "$AdminPwd" == '' ]] && read -p "Please input AdminUser's password:" AdminPwd
+	[ -z $AdminUser ] && read -p "Please input AdminUser's name:" AdminUser
+	[ -z $AdminPwd ] && read -p "Please input AdminUser's password:" AdminPwd
 	useradd -G sudo -d /home/$AdminUser -m -N -s /bin/bash $AdminUser
 	echo $AdminUser:"$AdminPwd" |chpasswd
 }
@@ -43,7 +53,7 @@ OTHER_USER_NOLONGIN(){
 INSTALL_BASE_PACKAGES(){
 	if [ "$SysName" == 'centos' ]; then
 		echo '[yum-fastestmirror Installing] ************************************************** >>';
-		[[ "$SysCount" == '' ]] && yum -y install yum-fastestmirror && SysCount="1"
+		[ -z $SysCount ] && yum -y install yum-fastestmirror && SysCount="1"
 		cp /etc/yum.conf /etc/yum.conf.back
 		sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
 		for arg do
@@ -52,7 +62,7 @@ INSTALL_BASE_PACKAGES(){
 		done;
 		mv -f /etc/yum.conf.back /etc/yum.conf;
 	else
-		[[ "$SysCount" == '' ]] && apt-get update && SysCount="1"
+		[ -z $SysCount ] && apt-get update && SysCount="1"
 		for arg do
 			echo "[${arg} Installing] ************************************************** >>";
 			apt-get install -y $arg --force-yes;apt-get -fy install;apt-get -y autoremove --purge;

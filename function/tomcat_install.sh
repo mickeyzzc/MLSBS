@@ -45,5 +45,5 @@ SELECT_TOMCAT_FUNCTION(){
 		esac
 		break
 	done
-	[ "$TomcatVersion" != '' -a "$JdkVersion" != '' ] && TOMCAT_INSTALL
+	[ -n $TomcatVersion -a -n $JdkVersion ] && TOMCAT_INSTALL
 }
