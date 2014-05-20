@@ -51,6 +51,7 @@ CRON_FOR_SYSTEM_CHECK(){
 	chown 700 $MyCronBashPath/sendmail.py
 	read -p "Input mail address :" MsgAccessory
 	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" -e "s/MsgAccessory=/MsgAccessory=$MsgAccessory/g" > $MyCronBashPath/system_check.sh
+	[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/system_check.sh
 	CronUser="root"
 	CronTime='10 1    * * *'
 	CronCmd="bash $MyCronBashPath/system_check.sh hdd"

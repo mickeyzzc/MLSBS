@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 #########################################################################
 # NOTE:
 # This Scripts all rights reserved deserved by MickeyZZC
