@@ -8,13 +8,15 @@ ScriptPath=$(cd $(dirname "$0") && pwd)
 source $ScriptPath/config
 #检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){
-if [ ! -f "$1" ]; then
-	echo -e "not exist $1,so $0 can not be supported!"
-	exit 1
-else
-	echo -e "loading $1 now, continue ......"
-	source $1
-fi
+for arg do
+	if [ ! -f "$arg" ]; then
+		echo -e "not exist $arg,so $0 can not be supported!"
+		exit 1
+	else
+		echo -e "loading $arg now, continue ......"
+		source $arg
+	fi
+done
 }
 #main
 SELECT_RUN_SCRIPT(){
@@ -47,7 +49,8 @@ SELECT_RUN_SCRIPT(){
 				SOURCE_SCRIPT $FunctionPath/puppet_install.sh
 				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;
 			"create cron")
-				SOURCE_SCRIPT $FunctionPath/create_cron.sh
+				SOURCE_SCRIPT $FunctionPath/decryption_encryption.sh $FunctionPath/create_cron.sh
+				SELECT_ENCRY_FUNCTION
 				SELECT_CRON_FUNCTION;;
 			"Exit")
 				exit 0;;

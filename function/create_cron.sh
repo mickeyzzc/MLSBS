@@ -15,6 +15,7 @@ CRON_FOR_SSHDENY(){
 	TEST_FILE $AuthLog
 	AuthLogTmp=$(echo $AuthLog|sed 's/\//\\\//g')
 	cat $BashTemplatePath/ssh_backlist_deny.sh|sed -e "s/var\[1\]/$AuthLogTmp/g" -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
+	[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/ssh_backlist_deny.sh
 	CronUser="root"
 	CronTime='00 5    * * *'
 	CronCmd="bash $MyCronBashPath/ssh_backlist_deny.sh"
@@ -34,6 +35,7 @@ CRON_FOR_MYSQL_SERVER(){
 			[ $? -gt 0 ] && echo "input err, please input again!" || break
 		done
 		cat $BashTemplatePath/mysql_server.sh |sed -e "s/MysqlUser=/MysqlUser=$MysqlUser/g" -e "s/MysqlPwd=/MysqlPwd=$MysqlPwd/g" -e "s/MysqlHost=/MysqlHost=$MysqlHost/g" -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" > $MyCronBashPath/mysql_server.sh
+		[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/mysql_server.sh
 		chown 700 $MyCronBashPath/mysql_server.sh
 		CronUser="root"
 		CronTime='10 0    * * *'
