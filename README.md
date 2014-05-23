@@ -16,12 +16,13 @@ mlsbs/
 │   ├── mysqlclient.sh
 │   └── mysqlserver.sh
 ├── bashTemplate #Bash脚本模板
-│   ├── mysql_server.sh #处理mysql服务器的日常任务脚本（new）
-│   └── ssh_backlist_deny.sh #ssh黑名单生成任务脚本（new）
+│   ├── mysql_server.sh #处理mysql服务器的日常任务脚本
+│   └── ssh_backlist_deny.sh #ssh黑名单生成任务脚本
+│   └── system_check.sh #硬盘空间检测任务脚本
 ├── config#脚本配置文件
 ├── function#被调用的函数目录
 │   ├── config_python.sh
-│   ├── create_cron.sh #生成日常任务（new）
+│   ├── create_cron.sh #生成日常任务
 │   ├── iptables_set.sh #包过滤软件iptables交互设置
 │   ├── mysql_install.sh #mysql源码数据库安装
 │   ├── nginx_install.sh #nginx源码安装
@@ -29,6 +30,7 @@ mlsbs/
 │   ├── report_system.sh
 │   ├── system_base_set.sh #系统基本配置
 │   └── tomcat_install.sh #tomcat自动部署
+│   └── decryption_encryption.sh #加密解密程序
 ├── LICENSE
 ├── myscript.sh #main执行文件
 ├── py2script #python2脚本

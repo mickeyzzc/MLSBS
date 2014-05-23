@@ -24,16 +24,16 @@ HDD_CHECK(){
 		BIG_FILE $i 500M 7 60 >> $MyBashLogPath/hdd$(date +"%Y%m%d").log
 	done
 	if [ -f $MyBashLogPath/hdd$(date +"%Y%m%d").log ];then
-		MsgTitle="$(date -d "yesterday" +"%Y%m%d"), HDD Warning Mail"
+		MsgTitle=$(date -d "yesterday" +"%Y%m%d"),"HDD Warning Mail"
 		MsgHtml=$(cat $MyBashLogPath/hdd$(date +"%Y%m%d").log |sed 's/$/\<br\>/g')
-		MY_MAIL $MsgTitle $MsgHtml
+		MY_MAIL
 	else
 		read -p "NO log to loading .... 10s to exit!" -t 10 ok
 	fi
 }
 MY_MAIL(){
 	MailReceiver=
-	[[ "$3" == "" ]] && python $MailTool -s $1 -m $2 -t $MailReceiver || python $MailTool -s $1 -m $2 -f $3 -t $MailReceiver
+	[ -z "$MsgAccessory" ] && python $MailTool -s "$MsgTitle" -m "$MsgHtml" -t "$MailReceiver" || python $MailTool -s "$MsgTitle" -m "$MsgHtml" -t "$MailReceiver" -f "$MsgAccessory"
 }
 case $1 in
 'hdd')
