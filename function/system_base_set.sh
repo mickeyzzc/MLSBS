@@ -21,6 +21,19 @@ TEST_PROGRAMS(){
 		fi
 	done
 }
+INPUT_CHOOSE(){
+	VarTmp=
+	select var in $@ "exit"; do
+		case $var in
+			$var)
+				VarTmp="$var"
+				break;;
+			"exit")
+				break;;
+		esac
+		echo "Input again"
+	done
+}
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，
