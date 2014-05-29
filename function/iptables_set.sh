@@ -57,7 +57,7 @@ IPTABLES_CHAINS_CHOOSE(){
 IPTABLES_PROTOCOL_SET(){
 	Protocols="icmp tcp udp ah udplite sctp dccp"
 	INPUT_CHOOSE $Protocols
-	[ -n "$VarTmp" -a "$VarTmp"!="exit" ] && Protocol="-p $VarTmp" || Protocol=""
+	[ -n "$VarTmp" ] && Protocol="-p $VarTmp" || Protocol=""
 }
 #输入需要有效的端口号
 IPTABLES_SET_PORT(){
