@@ -29,6 +29,7 @@ INPUT_CHOOSE(){
 				VarTmp="$var"
 				break;;
 			"exit")
+				VarTmp=""
 				break;;
 		esac
 		echo "Input again"
