@@ -1,7 +1,7 @@
 #!/bin/bash
 shopt -s extglob
 IPTABLES_VAR(){
-	Protocol="all"
+	Protocol=
 	MyChain=
 	MyInterface=
 	IpVersion="iptables ip6tables"
@@ -55,16 +55,16 @@ IPTABLES_CHAINS_CHOOSE(){
 	[ -n $VarTmp ] && MyChain=$VarTmp || IPTABLES_CHAINS_CHOOSE
 }
 IPTABLES_PROTOCOL_SET(){
-	Protocols="icmp tcp udp ah"
+	Protocols="icmp tcp udp ah udplite sctp dccp"
 	INPUT_CHOOSE $Protocols
-	[ -n $VarTmp ] && Protocol="-p $VarTmp" || Protocol="-p all"
+	[ -n $VarTmp ] && Protocol="-p $VarTmp" || Protocol=""
 }
 #输入需要有效的端口号
 IPTABLES_SET_PORT(){
 	InputPorts=""
 	InputPort=""
 	while true ;do
-		read -p "For every input port and then press enter to enter another, input 'r' or 'R' reset input, input 'a' of 'A' choose all port, input 'n' of 'N' exit" InputPort
+		read -p "For every input port and then press enter to enter another, input 'r' or 'R' reset input, input 'a' of 'A' choose all port, input 'n' of 'N' exit : " InputPort
 		case $InputPort in
 			[1-9][0-9]*)
 				if [ $InputPort -ge 65535 ];then
@@ -93,7 +93,7 @@ IPTABLES_SET_IP(){
 	InputIp=""
 	ext4ip="[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]"
 	while true ;do
-		read -p "Please input a valid IP and then press enter, input err ip to reset input, input 'n' of 'N' exit" InputIp
+		read -p "Please input a valid IP and then press enter, input err ip to reset input, input 'n' of 'N' exit : " InputIp
 		case $InputIp in
 			@($ext4ip).@($ext4ip).@($ext4ip).@($ext4ip))
 				IpVersion="iptables"
@@ -124,6 +124,8 @@ IPTABLES_INPUT_SET(){
 	INTERFACE_CHOOSE
 	echo "which chains are you choose?"
 	IPTABLES_CHAINS_CHOOSE
+	echo "which protocol are you choose?"
+	IPTABLES_PROTOCOL_SET
 	echo "which source ip are you choose?"
 	IPTABLES_SET_IP
 	[ -n "$InputIp" ] && SourceNet="-s $InputIp" || SourceNet=""
@@ -139,7 +141,17 @@ IPTABLES_INPUT_SET(){
 	echo "which status are you choose?"
 	IPTABLES_STATUS_SET
 	for var in $IpVersion ; do
-		$var $1 $MyChain $Protocol -m multiport $SourceNet $SPortRange $DesNet $DPortRange $IptableStat
+		if [ $(echo $SPortRange|grep ",") -o $(echo $DPortRange|grep ",") ] ; then
+			ModuleName="-m multiport"
+			until [ "$Protocol" != "-p tcp" -o "$Protocol" != "-p udp" -o "$Protocol" != "-p udplite" -o "$Protocol" != "-p sctp" -o "$Protocol" != "-p dccp" ] ; do
+					echo "You must choose the protocol with '-p tcp, -p udp, -p udplite, -p sctp or -p dccp'!"
+					IPTABLES_PROTOCOL_SET
+			done
+		else
+			ModuleName=""
+		fi
+		read -p "$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat" -t 10 ok
+		$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat
 	done
 }
 SELECT_IPTABLES_FUNCTION(){
