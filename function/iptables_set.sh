@@ -57,7 +57,7 @@ IPTABLES_CHAINS_CHOOSE(){
 IPTABLES_PROTOCOL_SET(){
 	Protocols="icmp tcp udp ah udplite sctp dccp"
 	INPUT_CHOOSE $Protocols
-	[ -n $VarTmp ] && Protocol="-p $VarTmp" || Protocol=""
+	[ -n "$VarTmp" -a "$VarTmp"!="exit" ] && Protocol="-p $VarTmp" || Protocol=""
 }
 #输入需要有效的端口号
 IPTABLES_SET_PORT(){
@@ -141,7 +141,7 @@ IPTABLES_INPUT_SET(){
 	echo "which status are you choose?"
 	IPTABLES_STATUS_SET
 	for var in $IpVersion ; do
-		if [ $(echo $SPortRange|grep ",") -o $(echo $DPortRange|grep ",") ] ; then
+		if [ "$(echo $SPortRange|grep ',')" -o "$(echo $DPortRange|grep ',')" ] ; then
 			ModuleName="-m multiport"
 			until [ "$Protocol" != "-p tcp" -o "$Protocol" != "-p udp" -o "$Protocol" != "-p udplite" -o "$Protocol" != "-p sctp" -o "$Protocol" != "-p dccp" ] ; do
 					echo "You must choose the protocol with '-p tcp, -p udp, -p udplite, -p sctp or -p dccp'!"
