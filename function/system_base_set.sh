@@ -23,10 +23,10 @@ TEST_PROGRAMS(){
 }
 INPUT_CHOOSE(){
 	VarTmp=
-	select var in $@ "exit"; do
-		case $var in
-			$var)
-				[ "$var" == "exit" ] && VarTmp="" || VarTmp="$var"
+	select vars in $@ "exit"; do
+		case $vars in
+			$vars)
+				[ "$vars" == "exit" ] && VarTmp="" || VarTmp="$vars"
 				break;;
 		esac
 		echo "Input again"

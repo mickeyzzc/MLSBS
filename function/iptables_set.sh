@@ -120,31 +120,49 @@ IPTABLES_STATUS_SET(){
 #增加防火墙的规则
 IPTABLES_INPUT_SET(){
 	IPTABLES_VAR
-	echo "which interface are you choose?"
+	echo "#############################################"
+	echo "#which interface are you choose?"
+	echo "#############################################"
 	INTERFACE_CHOOSE
-	echo "which chains are you choose?"
+	echo "#############################################"
+	echo "#which chains are you choose?"
+	echo "#############################################"
 	IPTABLES_CHAINS_CHOOSE
-	echo "which protocol are you choose?"
+	echo "#############################################"
+	echo "#which protocol are you choose?"
+	echo "#############################################"
 	IPTABLES_PROTOCOL_SET
-	echo "which source ip are you choose?"
+	echo "#############################################"
+	echo "#which source ip are you choose?"
+	echo "#############################################"
 	IPTABLES_SET_IP
 	[ -n "$InputIp" ] && SourceNet="-s $InputIp" || SourceNet=""
-	echo "which source port are you choose?"
+	echo "#############################################"
+	echo "#which source port are you choose?"
+	echo "#############################################"
 	IPTABLES_SET_PORT
 	[ -n "$InputPorts" ] && SPortRange="--sport $InputPorts" || SPortRange=""
-	echo "which destination ip are you choose?"
+	echo "#############################################"
+	echo "#which destination ip are you choose?"
+	echo "#############################################"
 	IPTABLES_SET_IP
 	[ -n "$InputIp" ] && DesNet="$InputIp" || DesNet=""
-	echo "which destination port are you choose?"
+	echo "#############################################"
+	echo "#which destination port are you choose?"
+	echo "#############################################"
 	IPTABLES_SET_PORT
 	[ -n "$InputPorts" ] &&	DPortRange="--dport $InputPorts" || DPortRange=""
-	echo "which status are you choose?"
+	echo "#############################################"
+	echo "#which status are you choose?"
+	echo "#############################################"
 	IPTABLES_STATUS_SET
 	for var in $IpVersion ; do
 		if [ "$(echo $SPortRange|grep ',')" -o "$(echo $DPortRange|grep ',')" ] ; then
 			ModuleName="-m multiport"
 			until [ "$Protocol" == "-p tcp" -o "$Protocol" == "-p udp" -o "$Protocol" == "-p udplite" -o "$Protocol" == "-p sctp" -o "$Protocol" == "-p dccp" ] ; do
-					echo "You must choose the protocol with '-p tcp, -p udp, -p udplite, -p sctp or -p dccp'!"
+					echo "#############################################"
+					echo "#You must choose the protocol with '-p tcp, -p udp, -p udplite, -p sctp or -p dccp'!"
+					echo "#############################################"
 					IPTABLES_PROTOCOL_SET
 			done
 		else
