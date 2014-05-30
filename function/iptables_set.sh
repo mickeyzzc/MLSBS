@@ -143,7 +143,7 @@ IPTABLES_INPUT_SET(){
 	for var in $IpVersion ; do
 		if [ "$(echo $SPortRange|grep ',')" -o "$(echo $DPortRange|grep ',')" ] ; then
 			ModuleName="-m multiport"
-			until [ "$Protocol" != "-p tcp" -o "$Protocol" != "-p udp" -o "$Protocol" != "-p udplite" -o "$Protocol" != "-p sctp" -o "$Protocol" != "-p dccp" ] ; do
+			until [ "$Protocol" == "-p tcp" -o "$Protocol" == "-p udp" -o "$Protocol" == "-p udplite" -o "$Protocol" == "-p sctp" -o "$Protocol" == "-p dccp" ] ; do
 					echo "You must choose the protocol with '-p tcp, -p udp, -p udplite, -p sctp or -p dccp'!"
 					IPTABLES_PROTOCOL_SET
 			done
