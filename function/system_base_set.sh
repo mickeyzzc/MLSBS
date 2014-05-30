@@ -26,10 +26,7 @@ INPUT_CHOOSE(){
 	select var in $@ "exit"; do
 		case $var in
 			$var)
-				VarTmp="$var"
-				break;;
-			"exit")
-				VarTmp=""
+				[ "$var" == "exit" ] && VarTmp="" || VarTmp="$var"
 				break;;
 		esac
 		echo "Input again"
