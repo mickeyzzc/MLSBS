@@ -41,9 +41,6 @@ INTERFACE_CHOOSE(){
 			$var)
 				MyInterface="-i $var"
 				break;;
-			"lo")
-				MyInterface="-i lo"
-				break;;
 		esac
 		MyInterface=""
 		break
@@ -168,7 +165,7 @@ IPTABLES_INPUT_SET(){
 		else
 			ModuleName=""
 		fi
-		read -p "$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat" -t 10 ok
+		read -p "$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat" -t 5 ok
 		$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat
 	done
 }

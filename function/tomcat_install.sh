@@ -1,9 +1,10 @@
 #!/bin/env bash
 TOMCAT_VAR(){
+	ApacheLine="http://mirrors.cnnic.cn/apache"
 	JdkVersion=""
 	TomcatVersion=""
 	TomcatPath="/usr/local/tomcat"
-	TomcatLine="http://mirrors.cnnic.cn/apache/tomcat"
+	TomcatLine="$ApacheLine/tomcat"
 }
 TOMCAT_BASE_PACKAGES_INSTALL(){
 	if [ "$SysName" == 'centos' ] ;then
@@ -15,16 +16,25 @@ TOMCAT_BASE_PACKAGES_INSTALL(){
 	fi
 	INSTALL_BASE_PACKAGES $BasePackages
 }
+APR_INSTALL(){
+	AprVersion="1"
+	AprPor="apr apr-iconv apr-util"
+	cd $DownloadTmp
+	for var in $AprPor ;do
+		wget -c -r -nd -np -L -A tar.gz $ApacheLine/apr/$var-$AprVersion
+	done
+}
 TOMCAT_INSTALL(){
 	TOMCAT_BASE_PACKAGES_INSTALL
-	cd /tmp/
+	cd $DownloadTmp
 	rm -rf apache-tomcat-*
 	wget -c -r -nd -np -L -A tar.gz -R deployer.tar.gz,fulldocs.tar.gz,src.tar.gz,embed.tar.gz $TomcatLine/tomcat-$TomcatVersion/
 	TomcatPackage=`ls apache-tomcat-$TomcatVersion*`
 	tar zxf $TomcatPackage
 	[ ! -d $TomcatPath ] && mkdir $TomcatPath
-	cp -R /tmp/${TomcatPackage%".tar.gz"}/* $TomcatPath
-	[ -f $TomcatPath/bin/catalina.sh ] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "/\/bin\//a JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m\"" $TomcatPath/bin/catalina.sh
+	cp -R $DownloadTmp/${TomcatPackage%".tar.gz"}/* $TomcatPath
+	[ -f $TomcatPath/bin/catalina.sh ] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "2 a/JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m -XX:+AggressiveOpts 
+ -XX:+UseBiasedLocking -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC\"" $TomcatPath/bin/catalina.sh
 	$TomcatPath/bin/startup.sh
 }
 SELECT_TOMCAT_FUNCTION(){

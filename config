@@ -24,3 +24,4 @@ BashTemplatePath="$ScriptPath/bashTemplate"
 MyCronBashPath="/usr/local/mybash"
 MyBashLogPath=/var/log/mybash
 Python2Path=$ScriptPath/py2script
+DownloadTmp="/tmp"

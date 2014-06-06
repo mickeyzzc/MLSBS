@@ -23,11 +23,11 @@ MYSQL_BASE_PACKAGES_INSTALL(){
 }
 #install mysql
 INSTALL_MYSQL(){
-	cd /tmp/
+	cd $DownloadTmp
 	echo "[${MysqlVersion} Installing] ************************************************** >>";
 	[ ! -f ${MysqlVersion}.tar.gz ] && wget -c ${MysqlLine}/${MysqlVersion}.tar.gz
-	tar -zxf /tmp/$MysqlVersion.tar.gz;
-	cd /tmp/$MysqlVersion;
+	tar -zxf $DownloadTmp/$MysqlVersion.tar.gz;
+	cd $DownloadTmp/$MysqlVersion;
 	groupadd mysql;
 	useradd -s /sbin/nologin -g mysql mysql;
 	cmake -DCMAKE_INSTALL_PREFIX=$MysqlPath -DWITH_DEBUG=OFF -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=ON -DENABLED_LOCAL_INFILE=ON -DWITH_INNODB_MEMCACHED=ON -DWITH_UNIT_TESTS=OFF;

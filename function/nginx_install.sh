@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NGINX_VAR(){
-	NginxVersion="nginx-1.4.5"
+	NginxVersion="nginx-1.6.0"
 	NginxPath="/usr/local/nginx"
 	ServerIP=""
 	ServerHostName=""
@@ -22,10 +22,10 @@ NGINX_INSTALL(){
 	NGINX_BASE_PACKAGES_INSTALL
 	groupadd www-data;
 	useradd -s /sbin/nologin -g www-data www-data;
-	cd /tmp/
+	cd $DownloadTmp
 	[ ! -f $NginxVersion.tar.gz ] && curl -O http://nginx.org/download/$NginxVersion.tar.gz
 	tar zxf $NginxVersion.tar.gz
-	cd /tmp/$NginxVersion
+	cd $DownloadTmp/$NginxVersion
 	./configure  --prefix=$NginxPath --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --with-http_realip_module --conf-path=$NginxPath/conf/nginx.conf --with-mail --with-mail_ssl_module
 	make && make install
 }

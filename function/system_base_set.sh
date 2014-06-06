@@ -1,6 +1,6 @@
 #!/bin/bash
 PASS_ENTER_TO_EXIT(){
-	read -p "input enter to exit" -t 30 ok
+	read -p "input enter to exit" -t 15 ok
 }
 TEST_FILE(){
 	if [ ! -f $1 ];then

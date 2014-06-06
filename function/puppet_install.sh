@@ -11,17 +11,17 @@ PUPPET_VAR(){
 }
 #install ruby
 RUBY_INSTALL(){
-	cd /tmp
+	cd $DownloadTmp
 	[ ! -f $RubyVersion.tar.gz ] && curl -O ftp://ftp.ruby-lang.org/pub/ruby/$RubyVersion.tar.gz
 	[ ! -f $OpenSSLVersion.tar.gz ] && curl -O ftp://ftp.openssl.org/source/$OpenSSLVersion.tar.gz
 	tar xzf $RubyVersion.tar.gz
 	tar xzf $OpenSSLVersion.tar.gz
-	cd /tmp/$OpenSSLVersion &&
+	cd $DownloadTmp/$OpenSSLVersion &&
 	./Configure linux-x86_64 --shared &&
 	make && make install
 	mv /usr/bin/openssl{,.old}
 	ln -s /usr/local/ssl/bin/openssl /usr/bin/openssl
-	cd /tmp/$RubyVersion &&
+	cd $DownloadTmp/$RubyVersion &&
 	./configure --with-openssl-dir=/usr/local/ssl --enable-shared &&
 	make && make install
 }
@@ -46,26 +46,26 @@ PUPPET_BASE_PACKAGES_INSTALL(){
 #now install puppet
 PUPPET_SOURCE_INSTALL(){
 	PUPPET_BASE_PACKAGES_INSTALL
-	cd /tmp
+	cd $DownloadTmp
 	[ ! -f $FacterVersion.tar.gz ] && curl -O https://downloads.puppetlabs.com/facter/$FacterVersion.tar.gz
 	[ ! -f $PuppetVersion.tar.gz ] && curl -O https://downloads.puppetlabs.com/puppet/$PuppetVersion.tar.gz
 	tar xzf $FacterVersion.tar.gz
 	tar xzf $PuppetVersion.tar.gz
-	cd /tmp/$FacterVersion
+	cd $DownloadTmp/$FacterVersion
 	ruby install.rb
-	cd /tmp/$PuppetVersion
+	cd $DownloadTmp/$PuppetVersion
 	ruby install.rb
 	sudo puppet resource group puppet ensure=present
 	sudo puppet resource user puppet ensure=present gid=puppet shell='/sbin/nologin'
 	if [[ "$SysName" == 'centos' ]]; then
-		[[ "$PuppetApplication" == 'puppetmaster' ]] && cp -af /tmp/$PuppetVersion/ext/redhat/server.init /etc/init.d/$PuppetApplication || cp -af /tmp/$PuppetVersion/ext/redhat/client.init /etc/init.d/$PuppetApplication 
+		[[ "$PuppetApplication" == 'puppetmaster' ]] && cp -af $DownloadTmp/$PuppetVersion/ext/redhat/server.init /etc/init.d/$PuppetApplication || cp -af $DownloadTmp/$PuppetVersion/ext/redhat/client.init /etc/init.d/$PuppetApplication 
 	else
 		if [[ "$PuppetApplication" == 'puppetmaster' ]]; then
-			cp -af /tmp/$PuppetVersion/ext/debian/puppetmaster.init /etc/init.d/$PuppetApplication
-			cp -af /tmp/$PuppetVersion/ext/debian/puppetmaster.default /etc/default/$PuppetApplication
+			cp -af $DownloadTmp/$PuppetVersion/ext/debian/puppetmaster.init /etc/init.d/$PuppetApplication
+			cp -af $DownloadTmp/$PuppetVersion/ext/debian/puppetmaster.default /etc/default/$PuppetApplication
 		else
-			cp -af /tmp/$PuppetVersion/ext/debian/puppet.init /etc/init.d/$PuppetApplication
-			cp -af /tmp/$PuppetVersion/ext/debian/puppet.default /etc/default/$PuppetApplication
+			cp -af $DownloadTmp/$PuppetVersion/ext/debian/puppet.init /etc/init.d/$PuppetApplication
+			cp -af $DownloadTmp/$PuppetVersion/ext/debian/puppet.default /etc/default/$PuppetApplication
 		fi
 		ln -s /usr/local/bin/puppet /usr/bin/puppet
 	fi
