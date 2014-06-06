@@ -2,7 +2,7 @@
 
 NGINX_VAR(){
 	NginxVersion="nginx-1.6.0"
-	NginxPath="/usr/local/nginx"
+	NginxPath="$InstallPath/nginx"
 	ServerIP=""
 	ServerHostName=""
 	[ -z $ServerHostName ] && read -p "Please input domain name:" ServerHostName

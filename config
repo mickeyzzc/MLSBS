@@ -19,9 +19,12 @@ OSlimit=`ulimit -n`
 SysVer=`uname -r|cut -d. -f1-2`
 
 #½Å±¾²ÎÊý
+InstallPath="/usr/local"
+LogPath="/var/log"
 FunctionPath="$ScriptPath/function"
 BashTemplatePath="$ScriptPath/bashTemplate"
-MyCronBashPath="/usr/local/mybash"
-MyBashLogPath=/var/log/mybash
-Python2Path=$ScriptPath/py2script
+MyCronBashPath="$InstallPath/mybash"
+MyBashLogPath="$LogPath/mybash"
+Python2Path="$ScriptPath/py2script"
 DownloadTmp="/tmp"
+

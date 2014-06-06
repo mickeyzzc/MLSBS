@@ -4,9 +4,9 @@
 MYSQL_VAR(){
 	MysqlVersion="mariadb-5.5.37"
 	MysqlLine="http://mirrors.neusoft.edu.cn/mariadb/mariadb-5.5.37/source"
-	MysqlPath="/usr/local/mysql"
+	MysqlPath="$InstallPath/mysql"
 	MysqlDataPath="$MysqlPath/data"
-	MysqlLogPath="/var/log/mysql"
+	MysqlLogPath="$LogPath/mysql"
 	MysqlConfigPath="$MysqlPath"
 	MysqlPass=""
 	[ -z $MysqlPass ] && read -p "Please input MYSQL's password:" MysqlPass

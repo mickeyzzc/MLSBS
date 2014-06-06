@@ -3,7 +3,7 @@ TOMCAT_VAR(){
 	ApacheLine="http://mirrors.cnnic.cn/apache"
 	JdkVersion=""
 	TomcatVersion=""
-	TomcatPath="/usr/local/tomcat"
+	TomcatPath="$InstallPath/tomcat"
 	TomcatLine="$ApacheLine/tomcat"
 }
 TOMCAT_BASE_PACKAGES_INSTALL(){
