@@ -56,4 +56,5 @@ SELECT_TOMCAT_FUNCTION(){
 		break
 	done
 	[ -n $TomcatVersion -a -n $JdkVersion ] && TOMCAT_INSTALL
+	APR_INSTALL
 }

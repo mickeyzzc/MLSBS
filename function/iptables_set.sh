@@ -36,14 +36,12 @@ INTERFACE_CHOOSE(){
 		echo "No effective ethernet , please setup the ethernet ."
 		exit 1
 	fi
-	select var in $Interfaces "lo"; do
+	select var in $Interfaces "lo" "all"; do
 		case $var in
 			$var)
-				MyInterface="-i $var"
+				[ "$vars" == "all" ] && MyInterface="" || MyInterface="-i $var"
 				break;;
 		esac
-		MyInterface=""
-		break
 	done
 }
 IPTABLES_CHAINS_CHOOSE(){
