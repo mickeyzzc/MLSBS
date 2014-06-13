@@ -163,8 +163,8 @@ IPTABLES_INPUT_SET(){
 		else
 			ModuleName=""
 		fi
-		read -p "$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat" -t 5 ok
-		$var $1 $MyChain $Protocol $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat
+		read -p "$var $1 $MyChain $Protocol $MyInterface $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat" -t 5 ok
+		$var $1 $MyChain $Protocol $MyInterface $ModuleName $SourceNet $SPortRange $DesNet $DPortRange $IptableStat
 	done
 }
 SELECT_IPTABLES_FUNCTION(){
