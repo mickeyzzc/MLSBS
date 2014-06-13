@@ -39,7 +39,7 @@ INTERFACE_CHOOSE(){
 	select var in $Interfaces "lo" "all"; do
 		case $var in
 			$var)
-				[ "$vars" == "all" ] && MyInterface="" || MyInterface="-i $var"
+				[ "$var" == "all" ] && MyInterface="" || MyInterface="-i $var"
 				break;;
 		esac
 	done
