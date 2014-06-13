@@ -67,7 +67,7 @@ http {
 }
 EOF
 	[ ! -d $NginxPath/conf/server ] && mkdir -p --mode=775 $NginxPath/conf/server/
-	cat >$NginxPath/conf/server/tomcat.comf<<EOF
+	cat >$NginxPath/conf/server/tomcat.conf<<EOF
 server{
     listen 80;
     server_name $ServerHostName;

@@ -21,7 +21,7 @@ APR_INSTALL(){
 	AprPor="apr apr-iconv apr-util"
 	cd $DownloadTmp
 	for var in $AprPor ;do
-		wget -c -r -nd -np -L -A tar.gz $ApacheLine/apr/$var-$AprVersion
+		wget -c -r -nd -np -L -A tar.gz $ApacheLine/apr/
 	done
 }
 TOMCAT_INSTALL(){
@@ -33,8 +33,7 @@ TOMCAT_INSTALL(){
 	tar zxf $TomcatPackage
 	[ ! -d $TomcatPath ] && mkdir $TomcatPath
 	cp -R $DownloadTmp/${TomcatPackage%".tar.gz"}/* $TomcatPath
-	[ -f $TomcatPath/bin/catalina.sh ] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "2 a/JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m -XX:+AggressiveOpts 
- -XX:+UseBiasedLocking -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC\"" $TomcatPath/bin/catalina.sh
+	[ -f $TomcatPath/bin/catalina.sh ] && JAVARAM=`expr $RamTotal / 2` &&	sed -i "2 a JAVA_OPTS=\"-server -Xms${JAVARAM}m -Xmx${JAVARAM}m -XX:+AggressiveOpts  -XX:+UseBiasedLocking -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC\"" $TomcatPath/bin/catalina.sh
 	$TomcatPath/bin/startup.sh
 }
 SELECT_TOMCAT_FUNCTION(){
