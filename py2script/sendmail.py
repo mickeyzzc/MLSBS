@@ -1,15 +1,16 @@
 #!/bin/env python
-import os,smtplib,mimetypes,ConfigParser,re
+import os,smtplib,mimetypes,ConfigParser,re,base64
+import os.path
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 def mailconfig():
     try:
         config=ConfigParser.ConfigParser()
-        with open('myconfig.txt','r') as cfgfile:
+        with open('pyconfig.conf','r') as cfgfile:
             config.readfp(cfgfile)
             USERNAME=config.get('email','username')
-            PASSWD=config.get('email','passwd')
+            PASSWD=base64.b64decode(config.get('email','passwd'))
             SMTP=config.get('email','smtp')
             return (USERNAME,PASSWD,SMTP)
     except:
