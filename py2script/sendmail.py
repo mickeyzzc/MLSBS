@@ -1,13 +1,13 @@
 #!/bin/env python
-import os,smtplib,mimetypes,ConfigParser,re,base64
-import os.path
+import os,smtplib,mimetypes,ConfigParser,re,base64,os.path
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 def mailconfig():
     try:
         config=ConfigParser.ConfigParser()
-        with open('pyconfig.conf','r') as cfgfile:
+        confile=os.path.join(os.getcwd(),'pyconfig.conf')
+        with open(confile,'r') as cfgfile:
             config.readfp(cfgfile)
             USERNAME=config.get('email','username')
             PASSWD=base64.b64decode(config.get('email','passwd'))
@@ -26,14 +26,13 @@ def mysendmail(mailist,subject,msg,filename=None):
         message["Subject"] = subject
         message["From"] = USERNAME
         message["To"] = ";".join(MAIL_LIST)
-#	message["To"] = MAIL_LIST
         if filename != None and os.path.exists(filename):
             ctype,encoding = mimetypes.guess_type(filename)
             if ctype is None or encoding is not None:
                 ctype = "application/octet-stream"
             maintype,subtype = ctype.split("/",1)
             attachment = MIMEImage((lambda f: (f.read(), f.close()))(open(filename, "rb"))[0], _subtype = subtype)
-            attachment.add_header("Content-Disposition", "attachment", filename = filename)
+            attachment.add_header("Content-Disposition", "attachment", filename = os.path.split(filename)[1])
             message.attach(attachment)
             
         s = smtplib.SMTP()
