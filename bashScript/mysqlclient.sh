@@ -35,4 +35,4 @@ for i in $(ls *$(date +%Y%m%d)* ); do
 		echo "$(date +%Y%m%d%H%M),$i is dump" >> $backuplog
 	fi
 done
-#rm $backuppath/$(date +%Y%m%d)
+#rm $backuppath/$(date +%Y%m%d

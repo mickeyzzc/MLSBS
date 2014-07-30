@@ -132,4 +132,4 @@ if __name__ == "__main__":
             print "DOWNLOAD OK"
         else:
             print "FTP TYPE IS ERROR"
-    mftp(options.ftp_type , options.ftp_host , options.ftp_post , options.ftp_user , options.ftp_password, options.remotefile, options.localfile)
+    mftp(options.ftp_type , options.ftp_host , options.ftp_post , options.ftp_user , options.ftp_password, options.remotefile, options.localfile
