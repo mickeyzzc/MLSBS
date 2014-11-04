@@ -94,7 +94,7 @@ SYSTEM_BASE_PACKAGES(){
 #
 TIMEZONE_SET(){
 	rm -rf /etc/localtime;
-	ln -s /usr/share/zoneinfo/Asia/Chongqing /etc/localtime;
+	ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime;
 	echo '[ntp Installing] ******************************** >>';
 	[ "$SysName" == 'centos' ] && yum install -y ntp || apt-get install -y ntpdate;
 	ntpdate -u pool.ntp.org;

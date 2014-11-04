@@ -1,40 +1,43 @@
 #MLSBS
-MLSBS is the abbreviation of "My linux's bash script"!
-¡°MLSBS¡±ÊÇ¡°My linux's bash script¡±µÄËõÐ´ linuxÔËÎ¬¼¼ÊõÈËÔ±ÈÕ³£ÐèÒªÐ´Ò»¶Ñ½Å±¾À´¼ò»¯¹¤×÷Á¿¡£¡°MLSBS¡±µÄÄ¿µÄ¾ÍÊÇ°ÑÎÒÈÕ³£ÔÚlinuxÏÂµÄ¹¤×÷Í¨¹ý½Å±¾ÕûºÏµ½Ò»¸öÏîÄ¿ÖÐ£¬ÐèÒªµÄÊ±ºò¼¸¸öµã»÷¾Í¿ÉÒÔÍê³ÉÈÎÎñÁË¡£
+###MLSBS is the abbreviation of "My linux's bash script"!
+**MLSBS** æ˜¯â€œMy linux's bash scriptâ€çš„ç¼©å†™ linuxè¿ç»´æŠ€æœ¯äººå‘˜æ—¥å¸¸éœ€è¦å†™ä¸€å †è„šæœ¬æ¥ç®€åŒ–å·¥ä½œé‡ã€‚â€œMLSBSâ€çš„ç›®çš„å°±æ˜¯æŠŠæˆ‘æ—¥å¸¸åœ¨linuxä¸‹çš„å·¥ä½œé€šè¿‡è„šæœ¬æ•´åˆåˆ°ä¸€ä¸ªé¡¹ç›®ä¸­ï¼Œéœ€è¦çš„æ—¶å€™å‡ ä¸ªç‚¹å‡»å°±å¯ä»¥å®Œæˆä»»åŠ¡äº†ã€‚
 
-ÓÉÓÚÒ»¸öÈËÊ±¼äÓÐÏÞ£¬½«ÒÔÍùµÄÔËÎ¬½Å±¾ÕûºÏµÄ½ø¶ÈÓÐµãÂý¡£ÔÝÊ±Ìá¹©Ò»¼ü°²×°¼¸¸ö³£ÓÃÈí¼þµÄ¹¦ÄÜ¡£ Ä¿Ç°½Å±¾µÄÄ¿Â¼ÈçÏÂ£º£¨¾­¹ýÔÚcentos6.5 ºÍubuntu12.04ÏÂ²âÊÔÍ¨¹ý¡££©
+ç”±äºŽä¸€ä¸ªäººæ—¶é—´æœ‰é™ï¼Œå°†ä»¥å¾€çš„è¿ç»´è„šæœ¬æ•´åˆçš„è¿›åº¦æœ‰ç‚¹æ…¢ã€‚æš‚æ—¶æä¾›ä¸€é”®å®‰è£…å‡ ä¸ªå¸¸ç”¨è½¯ä»¶çš„åŠŸèƒ½ã€‚ ç›®å‰è„šæœ¬çš„ç›®å½•å¦‚ä¸‹ï¼šï¼ˆç»è¿‡åœ¨Centos6.5 å’ŒUbuntu12.04ä¸‹æµ‹è¯•é€šè¿‡ã€‚ï¼‰
 
-°æ±¾ËµÃ÷£º
-v0.1°æ±¾£ºÎª³õÊ¼°æ±¾£¬Ö»Ìá¹©»ù±¾µÄÈÕ³£ÔËÎ¬Èí¼þµÄ¼òµ¥²¿Êð¹¦ÄÜ£¬Ä¿Ç°»¹ÓÐºÜ¶à½Å±¾Ã»ÓÐÕûºÏÆðÀ´£»
-ÐÂÔö¿ª·¢·ÖÖ§£ºÐÂÔöbash½Å±¾Ä£°å£¬½«½ÏÓÅÐãºÍ³£ÓÃµÄ½Å±¾Ä£°å»¯£¬¸ù¾ÝÐèÇóÉú³ÉcronÈÎÎñ¡£Ä£°åÂ·¾¶£¨bashTemplate£©
-v0.2°æ±¾£ºÕâ¸ö°æ±¾´¿ÊôÎªÁË´ÕÈÈÄÖ£¬ºÍÄ³Ð©ITÆóÒµ·¢²¼ÐÂÆ·µÄÕâ¸ö2014Äê5ÔÂ15ÈÕÈÕ×ÓÀï·¢²¼¶øÒÑ£¬¶Ô±Èv0.1°æ±¾Ôö¼ÓÁËCrontabÈÎÎñµÄÌí¼Ó¹¦ÄÜ£¬Ä¿Ç°Ôö¼ÓÁ½¸öÈÎÎñ½Å±¾¡£Í¬Ê±Ò²ÐÞ¸´ÁËmysqlÔÚ10GÒÔÏÂÓ²ÅÌ°²×°ºóÎÞ·¨Æô¶¯µÄBUG¡£
+**ç‰ˆæœ¬è¯´æ˜Žï¼š**
 
-Ä¿Â¼½á¹¹£º
-mlsbs/
-©À©¤©¤ bashScript #¶ÀÁ¢Ê¹ÓÃµÄbash½Å±¾
-©¦   ©À©¤©¤ curl_url.sh
-©¦   ©À©¤©¤ mysqlclient.sh
-©¦   ©¸©¤©¤ mysqlserver.sh
-©À©¤©¤ bashTemplate #Bash½Å±¾Ä£°å
-©¦   ©À©¤©¤ mysql_server.sh #´¦Àímysql·þÎñÆ÷µÄÈÕ³£ÈÎÎñ½Å±¾
-©¦   ©¸©¤©¤ ssh_backlist_deny.sh #sshºÚÃûµ¥Éú³ÉÈÎÎñ½Å±¾
-©¦   ©¸©¤©¤ system_check.sh #Ó²ÅÌ¿Õ¼ä¼ì²âÈÎÎñ½Å±¾
-©À©¤©¤ config#½Å±¾ÅäÖÃÎÄ¼þ
-©À©¤©¤ function#±»µ÷ÓÃµÄº¯ÊýÄ¿Â¼
-©¦   ©À©¤©¤ config_python.sh
-©¦   ©À©¤©¤ create_cron.sh #Éú³ÉÈÕ³£ÈÎÎñ
-©¦   ©À©¤©¤ iptables_set.sh #°ü¹ýÂËÈí¼þiptables½»»¥ÉèÖÃ
-©¦   ©À©¤©¤ mysql_install.sh #mysqlÔ´ÂëÊý¾Ý¿â°²×°
-©¦   ©À©¤©¤ nginx_install.sh #nginxÔ´Âë°²×°
-©¦   ©À©¤©¤ puppet_install.sh #puppet·þÎñ¶ËºÍ¿Í»§¶Ë°²×°ÅäÖÃ
-©¦   ©À©¤©¤ report_system.sh
-©¦   ©À©¤©¤ system_base_set.sh #ÏµÍ³»ù±¾ÅäÖÃ
-©¦   ©¸©¤©¤ tomcat_install.sh #tomcat×Ô¶¯²¿Êð
-©¦   ©¸©¤©¤ decryption_encryption.sh #¼ÓÃÜ½âÃÜ³ÌÐò
-©À©¤©¤ LICENSE
-©À©¤©¤ myscript.sh #mainÖ´ÐÐÎÄ¼þ
-©À©¤©¤ py2script #python2½Å±¾
-©¦   ©À©¤©¤ myconfig.conf
-©¦   ©À©¤©¤ myftp.py
-©¦   ©¸©¤©¤ sendmail.py
-©¸©¤©¤ README.md
+- v0.1ç‰ˆæœ¬ï¼šä¸ºåˆå§‹ç‰ˆæœ¬ï¼Œåªæä¾›åŸºæœ¬çš„æ—¥å¸¸è¿ç»´è½¯ä»¶çš„ç®€å•éƒ¨ç½²åŠŸèƒ½ï¼Œç›®å‰è¿˜æœ‰å¾ˆå¤šè„šæœ¬æ²¡æœ‰æ•´åˆèµ·æ¥ï¼›
+æ–°å¢žå¼€å‘åˆ†æ”¯ï¼šæ–°å¢žbashè„šæœ¬æ¨¡æ¿ï¼Œå°†è¾ƒä¼˜ç§€å’Œå¸¸ç”¨çš„è„šæœ¬æ¨¡æ¿åŒ–ï¼Œæ ¹æ®éœ€æ±‚ç”Ÿæˆcronä»»åŠ¡ã€‚æ¨¡æ¿è·¯å¾„ï¼ˆbashTemplateï¼‰
+
+- v0.2ç‰ˆæœ¬ï¼šè¿™ä¸ªç‰ˆæœ¬çº¯å±žä¸ºäº†å‡‘çƒ­é—¹ï¼Œå’ŒæŸäº›ITä¼ä¸šå‘å¸ƒæ–°å“çš„è¿™ä¸ª2014å¹´5æœˆ15æ—¥æ—¥å­é‡Œå‘å¸ƒè€Œå·²ï¼Œå¯¹æ¯”v0.1ç‰ˆæœ¬å¢žåŠ äº†Crontabä»»åŠ¡çš„æ·»åŠ åŠŸèƒ½ï¼Œç›®å‰å¢žåŠ ä¸¤ä¸ªä»»åŠ¡è„šæœ¬ã€‚åŒæ—¶ä¹Ÿä¿®å¤äº†mysqlåœ¨10Gä»¥ä¸‹ç¡¬ç›˜å®‰è£…åŽæ— æ³•å¯åŠ¨çš„BUGã€‚
+
+**ç›®å½•ç»“æž„ï¼š**
+
+mlsbs/  
+â”œâ”€â”€ bashScript #ç‹¬ç«‹ä½¿ç”¨çš„bashè„šæœ¬  
+â”‚   â”œâ”€â”€ curl_url.sh  
+â”‚   â”œâ”€â”€ mysqlclient.sh  
+â”‚   â””â”€â”€ mysqlserver.sh  
+â”œâ”€â”€ bashTemplate #Bashè„šæœ¬æ¨¡æ¿  
+â”‚   â”œâ”€â”€ mysql_server.sh #å¤„ç†mysqlæœåŠ¡å™¨çš„æ—¥å¸¸ä»»åŠ¡è„šæœ¬  
+â”‚   â””â”€â”€ ssh_backlist_deny.sh #sshé»‘åå•ç”Ÿæˆä»»åŠ¡è„šæœ¬  
+â”‚   â””â”€â”€ system_check.sh #ç¡¬ç›˜ç©ºé—´æ£€æµ‹ä»»åŠ¡è„šæœ¬  
+â”œâ”€â”€ config#è„šæœ¬é…ç½®æ–‡ä»¶  
+â”œâ”€â”€ function#è¢«è°ƒç”¨çš„å‡½æ•°ç›®å½•  
+â”‚   â”œâ”€â”€ config_python.sh  
+â”‚   â”œâ”€â”€ create_cron.sh #ç”Ÿæˆæ—¥å¸¸ä»»åŠ¡  
+â”‚   â”œâ”€â”€ iptables_set.sh #åŒ…è¿‡æ»¤è½¯ä»¶iptablesäº¤äº’è®¾ç½®  
+â”‚   â”œâ”€â”€ mysql_install.sh #mysqlæºç æ•°æ®åº“å®‰è£…  
+â”‚   â”œâ”€â”€ nginx_install.sh #nginxæºç å®‰è£…  
+â”‚   â”œâ”€â”€ puppet_install.sh #puppetæœåŠ¡ç«¯å’Œå®¢æˆ·ç«¯å®‰è£…é…ç½®  
+â”‚   â”œâ”€â”€ report_system.sh  
+â”‚   â”œâ”€â”€ system_base_set.sh #ç³»ç»ŸåŸºæœ¬é…ç½®  
+â”‚   â””â”€â”€ tomcat_install.sh #tomcatè‡ªåŠ¨éƒ¨ç½²  
+â”‚   â””â”€â”€ decryption_encryption.sh #åŠ å¯†è§£å¯†ç¨‹åº  
+â”œâ”€â”€ LICENSE  
+â”œâ”€â”€ myscript.sh #mainæ‰§è¡Œæ–‡ä»¶  
+â”œâ”€â”€ py2script #python2è„šæœ¬  
+â”‚   â”œâ”€â”€ myconfig.conf  
+â”‚   â”œâ”€â”€ myftp.py  
+â”‚   â””â”€â”€ sendmail.py  
+â””â”€â”€ README.md  
