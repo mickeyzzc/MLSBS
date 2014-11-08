@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 *.s[a-w][a-z]
 *.un~
 Session.vim
 .netrwhist
-*~
-=======
 .*
 !.gitignore
 *~
->>>>>>> 8b63121b1d581e6a2085e86cda1476fd79569e52

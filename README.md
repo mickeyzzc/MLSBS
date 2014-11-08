@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #MLSBS
 ###MLSBS is the abbreviation of "My linux's bash script"!
 **MLSBS** 是“My linux's bash script”的缩写 linux运维技术人员日常需要写一堆脚本来简化工作量。“MLSBS”的目的就是把我日常在linux下的工作通过脚本整合到一个项目中，需要的时候几个点击就可以完成任务了。
@@ -42,6 +41,4 @@ mlsbs/
 │   ├── myftp.py  
 │   └── sendmail.py  
 └── README.md  
-=======
-#MLSLIB
->>>>>>> 8b63121b1d581e6a2085e86cda1476fd79569e52
+
