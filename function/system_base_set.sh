@@ -74,12 +74,14 @@ INSTALL_BASE_PACKAGES(){
 		mv -f /etc/yum.conf.back /etc/yum.conf;
 	else
 		[ -z $SysCount ] && apt-get update && SysCount="1"
+		apt-get -fy install;apt-get -y autoremove --purge;
+		dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
 		for arg do
 			echo "[${arg} Installing] ************************************************** >>";
-			apt-get install -y $arg --force-yes;apt-get -fy install;apt-get -y autoremove --purge;
-			dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
+			apt-get install -y $arg --force-yes;
 		done;
 	fi;
+	return 1
 }
 #
 #调用INSTALL_BASE_PACKAGES给系统安装一些必要的工具

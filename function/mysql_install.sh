@@ -2,8 +2,8 @@
 #base mysql's parameter
 [ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
 MYSQL_VAR(){
-	MysqlVersion="mariadb-5.5.37"
-	MysqlLine="http://mirrors.neusoft.edu.cn/mariadb/mariadb-5.5.37/source"
+	MysqlVersion="mariadb-5.5.40"
+	MysqlLine="http://mirrors.neusoft.edu.cn/mariadb/mariadb-5.5.40/source"
 	MysqlPath="$InstallPath/mysql"
 	MysqlDataPath="$MysqlPath/data"
 	MysqlLogPath="$LogPath/mysql"
@@ -107,6 +107,7 @@ EOF
 	chmod 775 /etc/init.d/mysqld;
 	/etc/init.d/mysqld start;
 	for i in mysql mysqladmin mysqlcheck mysqldump;do
+		rm -rf /usr/bin/$i
 		ln -s $MysqlPath/bin/$i /usr/bin/$i;
 	done
 	$MysqlPath/bin/mysqladmin password $MysqlPass;
