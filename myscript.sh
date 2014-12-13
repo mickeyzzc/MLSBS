@@ -1,4 +1,5 @@
 #!/bin/bash
+# -*- coding:utf-8 -*-
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear;
@@ -6,18 +7,32 @@ clear;
 ScriptPath=$(cd $(dirname "$0") && pwd)
 #加载配置内容
 source $ScriptPath/config
+#################错误提示##############################
+cn="false"
+case $LANG in
+	zh_CN*) cn="true";;
+esac
+EXIT_MSG(){
+	$cn && ExitLog="$1" || ExitLog="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitLog " && exit 1
+}
+#########普通日志##########
+INFO_MSG(){
+	$cn && InfoLog="$1" || InfoLog="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoLog "
+}
 #检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){
 for arg do
 	if [ ! -f "$arg" ]; then
-		echo -e "not exist $arg,so $0 can not be supported!"
-		exit 1
+		EXIT_MSG "缺少文件：$arg ，程序无法运行，请重新下载原程序！" "not exist $arg,so $0 can not be supported!" 
 	else
-		echo -e "loading $arg now, continue ......"
+		INFO_MSG "正在加载库: $arg ......" "loading $arg now, continue ......"
 		source $arg
 	fi
 done
 }
+SOURCE_SCRIPT $LibPath/common
 #main
 SELECT_RUN_SCRIPT(){
 	clear;

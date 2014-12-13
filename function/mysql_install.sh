@@ -2,8 +2,8 @@
 #base mysql's parameter
 [ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
 MYSQL_VAR(){
-	MysqlVersion="mariadb-5.5.40"
-	MysqlLine="http://mirrors.neusoft.edu.cn/mariadb/mariadb-5.5.40/source"
+	MysqlVersion="mysql-5.6.21"
+	MysqlLine="http://cdn.mysql.com/Downloads/MySQL-5.6"
 	MysqlPath="$InstallPath/mysql"
 	MysqlDataPath="$MysqlPath/data"
 	MysqlLogPath="$LogPath/mysql"
@@ -96,11 +96,11 @@ EOF
 	$MysqlPath/scripts/mysql_install_db --user=mysql --defaults-file=$MysqlConfigPath/my.cnf --basedir=$MysqlPath --datadir=$MysqlDataPath;
 # EOF **********************************
 cat > /etc/ld.so.conf.d/mysql.conf<<EOF
-/usr/local/mysql/lib/mysql
-/usr/local/lib
+$MysqlPath/lib
 EOF
 # **************************************
 	ldconfig;
+	rm -f /usr/lib64/mysql /usr/lib/mysql /etc/init.d/mysqld
 	[ "$SysBit" == '64' ] && ln -s $MysqlPath/lib/mysql /usr/lib64/mysql
 	[ $? -gt 0 ] && ln -s $MysqlPath/lib/mysql /usr/lib/mysql
 	cp $MysqlPath/support-files/mysql.server /etc/init.d/mysqld;

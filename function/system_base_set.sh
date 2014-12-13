@@ -1,37 +1,5 @@
 #!/bin/bash
-PASS_ENTER_TO_EXIT(){
-	read -p "input enter to exit" -t 15 ok
-}
-TEST_FILE(){
-	if [ ! -f $1 ];then
-		echo "Not exist $1"
-		PASS_ENTER_TO_EXIT
-		SELECT_RUN_SCRIPT
-	else
-		echo "loading $1 now..."
-	fi
-}
-TEST_PROGRAMS(){
-	for arg do
-		if [ -z $(which $arg) ];then
-			read -p "Your system do not have $arg" -t 10 ok
-			return 0
-		else
-			read -p "loading $arg ..." -t 1 ok
-		fi
-	done
-}
-INPUT_CHOOSE(){
-	VarTmp=
-	select vars in $@ "exit"; do
-		case $vars in
-			$vars)
-				[ "$vars" == "exit" ] && VarTmp="" || VarTmp="$vars"
-				break;;
-		esac
-		echo "Input again"
-	done
-}
+# -*- coding:utf-8 -*-
 #add system's administrator
 #
 #新增一名具备sudo权限的管理员，

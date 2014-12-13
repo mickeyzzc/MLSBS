@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 #check system parameter about cpu's core ,ram ,other
 #
 #收集系统的一些基础参数给其他函数使用
@@ -21,6 +22,7 @@ SysVer=`uname -r|cut -d. -f1-2`
 #脚本参数
 InstallPath="/usr/local"
 LogPath="/var/log"
+LibPath="$ScriptPath/lib"
 FunctionPath="$ScriptPath/function"
 BashTemplatePath="$ScriptPath/bashTemplate"
 MyCronBashPath="$InstallPath/mybash"
