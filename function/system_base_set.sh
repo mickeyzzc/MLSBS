@@ -25,32 +25,6 @@ OTHER_USER_NOLONGIN(){
 		fi
 	done
 }
-#install some tool
-#
-#这功能可以给其他脚本调用来安装基础软件，如编译mysql需要的gcc等工具
-#
-INSTALL_BASE_PACKAGES(){
-	if [ "$SysName" == 'centos' ]; then
-		echo '[yum-fastestmirror Installing] ************************************************** >>';
-		[ -z $SysCount ] && yum -y install yum-fastestmirror && SysCount="1"
-		cp /etc/yum.conf /etc/yum.conf.back
-		sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
-		for arg do
-			echo "[${arg} Installing] ************************************************** >>";
-			yum -y install $arg; 
-		done;
-		mv -f /etc/yum.conf.back /etc/yum.conf;
-	else
-		[ -z $SysCount ] && apt-get update && SysCount="1"
-		apt-get -fy install;apt-get -y autoremove --purge;
-		dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
-		for arg do
-			echo "[${arg} Installing] ************************************************** >>";
-			apt-get install -y $arg --force-yes;
-		done;
-	fi;
-	return 1
-}
 #
 #调用INSTALL_BASE_PACKAGES给系统安装一些必要的工具
 #

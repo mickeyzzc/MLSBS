@@ -13,13 +13,13 @@ case $LANG in
 	zh_CN*) cn="true";;
 esac
 EXIT_MSG(){
-	$cn && ExitLog="$1" || ExitLog="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitLog " && exit 1
+	$cn && ExitMsg="$1" || ExitMsg="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " && exit 1
 }
 #########普通日志##########
 INFO_MSG(){
-	$cn && InfoLog="$1" || InfoLog="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoLog "
+	$cn && InfoMsg="$1" || InfoMsg="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoMsg "
 }
 #检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){
@@ -32,10 +32,10 @@ for arg do
 	fi
 done
 }
+[[ "$SysName" == '' ]] && EXIT_MSG "程序不支持在此系统上运行。" "Your system is not supported this script"
 SOURCE_SCRIPT $LibPath/common
 #main
 SELECT_RUN_SCRIPT(){
-	clear;
 	SOURCE_SCRIPT $FunctionPath/system_base_set.sh
 	echo "[Notice] Which function you want to run:"
 	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Setup firewall" "Install Puppet" "create cron" "Exit";do
@@ -64,7 +64,7 @@ SELECT_RUN_SCRIPT(){
 				SOURCE_SCRIPT $FunctionPath/puppet_install.sh
 				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;
 			"create cron")
-				SOURCE_SCRIPT $FunctionPath/decryption_encryption.sh $FunctionPath/create_cron.sh
+				SOURCE_SCRIPT $LibPath/decryption_encryption $FunctionPath/create_cron.sh
 				SELECT_ENCRY_FUNCTION
 				SELECT_CRON_FUNCTION;;
 			"Exit")

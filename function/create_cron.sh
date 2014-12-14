@@ -1,6 +1,5 @@
 #!/bin/bash
-
-[[ "$SysName" == 'centos' ]] && AuthLog="/var/log/secure" || AuthLog="/var/log/auth.log"
+# -*- coding:utf-8 -*-
 CronCmd=""
 CronUser=""
 CronTime=""
@@ -8,13 +7,21 @@ MyBashLogPathTmp=$(echo $MyBashLogPath|sed 's/\//\\\//g')
 [ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 CRON_CREATE(){
 	grep "$CronCmd" /etc/crontab > /dev/null
-	[ $? -gt 0 ] && echo -e "$1" >> /etc/crontab || echo "Nothing has be created"
+	if [ $? -gt 0 ];then
+		echo -e "$1" >> /etc/crontab
+		INFO_MSG "任务 ：\"$1 \"已生成." "CRON :\"$1 \" is created."
+		return 0
+	else
+		INFO_MSG "任务没有生成。" "Nothing has be created"
+		return 1
+	fi
 }
 CRON_FOR_SSHDENY(){
+	[[ "$SysName" == 'centos' ]] && AuthLog="/var/log/secure" || AuthLog="/var/log/auth.log"
 	TEST_FILE $BashTemplatePath/ssh_backlist_deny.sh
 	TEST_FILE $AuthLog
 	AuthLogTmp=$(echo $AuthLog|sed 's/\//\\\//g')
-	cat $BashTemplatePath/ssh_backlist_deny.sh|sed -e "s/var\[1\]/$AuthLogTmp/g" -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
+	cat $BashTemplatePath/ssh_backlist_deny.sh|sed -e "s/@AuthLog/$AuthLogTmp/g" -e "s/@MyBashLogPath/$MyBashLogPathTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
 	[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/ssh_backlist_deny.sh
 	CronUser="root"
 	CronTime='00 5    * * *'
