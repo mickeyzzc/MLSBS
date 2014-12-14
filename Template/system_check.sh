@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#! Encoding UTF-8
 #########################################################################
 # NOTE:
 # The test system is Ubuntu14.04

@@ -1,9 +1,10 @@
-#!/bin/bash
-# -*- coding:utf-8 -*-
-CronCmd=""
-CronUser=""
-CronTime=""
-MyBashLogPathTmp=$(echo $MyBashLogPath|sed 's/\//\\\//g')
+#! Encoding UTF-8
+CRON_VARS(){
+	CronCmd=""
+	CronUser=""
+	CronTime=""
+	MyBashLogPathTmp=$(echo $MyBashLogPath|sed 's/\//\\\//g')
+}
 [ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 CRON_CREATE(){
 	grep "$CronCmd" /etc/crontab > /dev/null
@@ -18,67 +19,56 @@ CRON_CREATE(){
 }
 CRON_FOR_SSHDENY(){
 	[[ "$SysName" == 'centos' ]] && AuthLog="/var/log/secure" || AuthLog="/var/log/auth.log"
-	TEST_FILE $BashTemplatePath/ssh_backlist_deny.sh
+	TEST_FILE $TemplatePath/ssh_backlist_deny.sh
+	BACK_TO_INDEX
 	TEST_FILE $AuthLog
+	BACK_TO_INDEX
 	AuthLogTmp=$(echo $AuthLog|sed 's/\//\\\//g')
-	cat $BashTemplatePath/ssh_backlist_deny.sh|sed -e "s/@AuthLog/$AuthLogTmp/g" -e "s/@MyBashLogPath/$MyBashLogPathTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
-	[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/ssh_backlist_deny.sh
+	cat $TemplatePath/ssh_backlist_deny.sh|sed -e "s/@AuthLog/$AuthLogTmp/g" -e "s/@MyBashLogPath/$MyBashLogPathTmp/g" > $MyCronBashPath/ssh_backlist_deny.sh
+	[[ -n "$ENCRY_FUNCTION" ]] && $ENCRY_FUNCTION $MyCronBashPath/ssh_backlist_deny.sh
 	CronUser="root"
 	CronTime='00 5    * * *'
 	CronCmd="bash $MyCronBashPath/ssh_backlist_deny.sh"
 	CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
 }
-CRON_FOR_MYSQL_SERVER(){
-	if [ -z $(which mysqldump) -o -z $(which mysql) ];then
-		read -p "Your system is not supported this task" -t 5 ok
-	else
-		TEST_FILE $BashTemplatePath/mysql_server.sh
-		while true ; do
-			read -p "Please input mysql server's ip:" MysqlHost
-			read -p "Please input mysql server's username:" MysqlUser
-			read -p "Please input mysql server's password:" MysqlPwd
-			#read -p "Whice is the backup directory :" MysqlBackupPath
-			mysql -h$MysqlHost -u$MysqlUser -p$MysqlPwd -e"show databases" 2>&1 >>/dev/null
-			[ $? -gt 0 ] && echo "input err, please input again!" || break
-		done
-		cat $BashTemplatePath/mysql_server.sh |sed -e "s/MysqlUser=/MysqlUser=$MysqlUser/g" -e "s/MysqlPwd=/MysqlPwd=$MysqlPwd/g" -e "s/MysqlHost=/MysqlHost=$MysqlHost/g" -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" > $MyCronBashPath/mysql_server.sh
-		[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/mysql_server.sh
-		chown 700 $MyCronBashPath/mysql_server.sh
-		CronUser="root"
-		CronTime='10 0    * * *'
-		CronCmd="bash $MyCronBashPath/mysql_server.sh backup"
-		CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
-	fi
-}
 CRON_FOR_SYSTEM_CHECK(){
-	TEST_FILE $BashTemplatePath/system_check.sh
+	TEST_FILE $TemplatePath/system_check.sh
+	BACK_TO_INDEX
 	TEST_FILE $Python2Path/sendmail.py
+	BACK_TO_INDEX
 	TEST_FILE $Python2Path/pyconfig.conf
+	BACK_TO_INDEX
 	cp $Python2Path/sendmail.py $Python2Path/pyconfig.conf $MyCronBashPath/
 	chown 700 $MyCronBashPath/sendmail.py
 	read -p "Input mail address :" MsgAccessory
-	cat $BashTemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" -e "s/MsgAccessory=/MsgAccessory=$MsgAccessory/g" > $MyCronBashPath/system_check.sh
-	[ -n $ENCRY_FUNCTION ] && $ENCRY_FUNCTION $MyCronBashPath/system_check.sh
+	cat $TemplatePath/system_check.sh |sed -e "s/MyBashLogPath=/MyBashLogPath=$MyBashLogPathTmp/g" -e "s/MailTool=/MailTool=$(echo $MyCronBashPath/sendmail.py|sed 's/\//\\\//g')/g" -e "s/MsgAccessory=/MsgAccessory=$MsgAccessory/g" > $MyCronBashPath/system_check.sh
+	[[ -n "$ENCRY_FUNCTION" ]] && $ENCRY_FUNCTION $MyCronBashPath/system_check.sh
 	CronUser="root"
 	CronTime='10 1    * * *'
 	CronCmd="bash $MyCronBashPath/system_check.sh hdd"
 	CRON_CREATE "$CronTime\t$CronUser\t$CronCmd"
 }
 SELECT_CRON_FUNCTION(){
-	clear;
-	echo "[Notice] Which cron_function you want to run:"
-	select var in "ssh blacklist deny" "backup mysql's datebases" "check system" "back";do
+	CRON_VARS
+	echo "----------------------------------------------------------------"
+	declare -a VarLists
+	if $cn ;then
+		echo "[Notice] 请选择需要生成的任务:"
+		VarLists=("返回首页" "SSH黑名单生成任务" "系统日常自检任务")
+	else
+		echo "[Notice] Which cron_function you want to run:"
+		VarLists=("back" "ssh_blacklist_deny" "check_system")
+	fi
+	select var in ${VarLists[@]} ;do
 		case $var in
-			"ssh blacklist deny")
+			${VarLists[1]})
 				CRON_FOR_SSHDENY;;
-			"backup mysql's datebases")
-				CRON_FOR_MYSQL_SERVER;;
-			"check system")
+			${VarLists[2]})
 				CRON_FOR_SYSTEM_CHECK;;
-			"back")
+			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;
 			*)
-				SELECT_SYSTEM_BASE_FUNCTION;;
+				SELECT_CRON_FUNCTION;;
 		esac
 		PASS_ENTER_TO_EXIT
 		break

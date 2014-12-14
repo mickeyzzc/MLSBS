@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-# -*- coding:utf-8 -*-
+#! Encoding UTF-8
 ENCRY_GZEXE(){
 	TEST_PROGRAMS gzexe
 	[ $? -eq 0 ] && gzexe $1
@@ -31,14 +30,21 @@ ENCRY_SHC(){
 }
 SELECT_ENCRY_FUNCTION(){
 	echo "----------------------------------------------------------------"
-	echo "[Notice] How to encryption your script:"
-	select var in "Use gzexe" "Use shc" "Do not encryption";do
+	declare -a VarLists
+	if $cn ;then
+		echo "[Notice] 请选择需要你想要加密的方式:"
+		VarLists=("使用gzexe压缩" "使用shc加密" "不加密")
+	else
+		echo "[Notice] How to encryption your script:"
+		VarLists=("Use_gzexe" "Use_shc" "Do_not_encryption")
+	fi
+	select var in ${VarLists[@]} ;do
 		case $var in
-			"Use gzexe")
+			${VarLists[0]})
 				ENCRY_FUNCTION="ENCRY_GZEXE";;
-			"Use shc" )
+			${VarLists[1]})
 				ENCRY_FUNCTION="ENCRY_SHC";;
-			"Do not encryption")
+			${VarLists[2]})
 				ENCRY_FUNCTION="";;
 			*)
 				SELECT_ENCRY_FUNCTION;;

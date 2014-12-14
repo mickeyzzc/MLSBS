@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# -*- coding:utf-8 -*-
+#! Encoding UTF-8
 #########################################################################
 # NOTE:
 # This Scripts all rights reserved deserved by MickeyZZC

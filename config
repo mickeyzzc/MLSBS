@@ -1,9 +1,8 @@
-#!/bin/bash
-# -*- coding:utf-8 -*-
+#! Encoding UTF-8
 #≈‰÷√≤Œ ˝
 InstallPath="/usr/local"
 
-LibPath="$ScriptPath/lib"
+LibPath="$ScriptPath/mylib"
 FunctionPath="$ScriptPath/function"
 TemplatePath="$ScriptPath/Template"
 MyCronBashPath="$InstallPath/mybash"
