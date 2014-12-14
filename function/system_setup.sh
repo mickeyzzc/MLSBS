@@ -22,8 +22,8 @@ TIMEZONE_SET(){
 	echo '[ntp Installing] ******************************** >>';
 	[ "$SysName" == 'centos' ] && yum install -y ntp || apt-get install -y ntpdate;
 	ntpdate -u pool.ntp.org;
-	TimeCron="0 * * * * /usr/sbin/ntpdate cn.pool.ntp.org >> /dev/null 2>&1 ;hwclock -w"
-	[[ "$(grep $TimeCron /etc/crontab)" == "" ]] && echo "$TimeCron" >> /etc/crontab
+	TimeCron="0 * * * * root /usr/sbin/ntpdate cn.pool.ntp.org >>/dev/null 2>&1 ;hwclock -w"
+	[[ -z $(grep "$TimeCron" /etc/crontab) ]] && echo "$TimeCron" >> /etc/crontab
 	[ "$SysName" == 'centos' ] && /etc/init.d/crond restart || /etc/init.d/cron restart
 }
 #main
