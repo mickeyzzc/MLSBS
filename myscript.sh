@@ -3,15 +3,70 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear;
-#获取脚本路劲
-ScriptPath=$(cd $(dirname "$0") && pwd)
-#加载配置内容
-source $ScriptPath/config
-#################错误提示##############################
 cn="false"
 case $LANG in
 	zh_CN*) cn="true";;
 esac
+#获取脚本路劲
+ScriptPath=$(cd $(dirname "$0") && pwd)
+CONFIG_CREATE(){
+	declare -a VarLists
+	declare -a ValueLists
+	declare -a ExplainLists
+	ValueLists=("/var/log" "/usr/local" "/tmp")
+	VarLists=("LogPath" "InstallPath" "DownloadTmp")
+	$cn && ExplainLists=("日志路径" "安装路径" "缓存路径") || ExplainLists=("Logs" "Install" "Download")
+	count=0
+	for var in ${VarLists[@]} ;do
+		$cn &&  TmpMsg="请输入需要生成的${ExplainLists[$count]}." || TmpMsg="Please input the path with ${ExplainLists[$count]}."
+		read -p "$TmpMsg" -t 30 tmpvar
+		eval ${VarLists[$count]}=${tmpvar:-${ValueLists[$count]}}
+		echo "========================================================================="
+		echo "#             ${VarLists[$count]}=${tmpvar:-${ValueLists[$count]}}           #"
+		count=$(expr $count + 1)
+	done
+cat > $ScriptPath/config <<eof
+#! Encoding UTF-8
+#配置参数
+#基础路径
+InstallPath="/usr/local"
+DownloadTmp="/tmp"
+LogPath="/var/log"
+#程序路径
+LibPath="\$ScriptPath/mylib"
+FunctionPath="\$ScriptPath/function"
+TemplatePath="\$ScriptPath/Template"
+MyCronBashPath="\$InstallPath/mybash"
+MyBashLogPath="\$LogPath/mybash"
+Python2Path="\$ScriptPath/py2script"
+#日志路径
+InfoLog=\$LogPath/mlsbs_err\$(date +%Y%m%d).log
+ErrLog=\$LogPath/mlsbs_info\$(date +%Y%m%d).log
+#check system parameter about cpu's core ,ram ,other
+#
+#收集系统的一些基础参数给其他函数使用
+#
+SysName=""
+SysCount=""
+
+egrep -i "centos" /etc/issue && SysName='centos';
+egrep -i "debian" /etc/issue && SysName='debian';
+egrep -i "ubuntu" /etc/issue && SysName='ubuntu';
+
+SysBit='32' && [ \$(getconf WORD_BIT) == '32' ] && [ \$(getconf LONG_BIT) == '64' ] && SysBit='64';
+CpuNum=\$(cat /proc/cpuinfo |grep 'processor'|wc -l);
+RamTotal=$(free -m | grep 'Mem' | awk '{print $2}');
+RamSwap=$(free -m | grep 'Swap' | awk '{print $2}');
+RamSum=\$[\$RamTotal+\$RamSwap];
+FileMax=\$(cat /proc/sys/fs/file-max)
+OSlimit=\$(ulimit -n)
+SysVer=$(uname -r|cut -d. -f1-2)
+eof
+}
+#加载配置内容
+[[ ! -f $ScriptPath/config ]] && CONFIG_CREATE
+source $ScriptPath/config
+#################错误提示##############################
 EXIT_MSG(){
 	$cn && ExitMsg="$1" || ExitMsg="$2"
 	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " && exit 1

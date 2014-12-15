@@ -19,10 +19,10 @@ ADMINUSER_ADD(){
 TIMEZONE_SET(){
 	rm -rf /etc/localtime;
 	ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime;
-	echo '[ntp Installing] ******************************** >>';
+	INFO_MSG  '[正在安装 ntp] ******************************** >>' '[ntp Installing] ******************************** >>';
 	[ "$SysName" == 'centos' ] && yum install -y ntp || apt-get install -y ntpdate;
 	ntpdate -u pool.ntp.org;
-	TimeCron="0 * * * * root /usr/sbin/ntpdate cn.pool.ntp.org >>/dev/null 2>&1 ;hwclock -w"
+	TimeCron="0 * * * *	root /usr/sbin/ntpdate cn.pool.ntp.org >>/dev/null 2>&1 ;hwclock -w"
 	[[ -z $(grep "$TimeCron" /etc/crontab) ]] && echo "$TimeCron" >> /etc/crontab
 	[ "$SysName" == 'centos' ] && /etc/init.d/crond restart || /etc/init.d/cron restart
 }
@@ -51,7 +51,7 @@ SELECT_SYSTEM_SETUP_FUNCTION(){
 				if [ ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -ge 13 ];then
 					read -p "wait my script update" -t 5 ok
 				elif [ ${SysVer%%.*} -eq 2 -o ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -le 25 ];then
-					SOURCE_SCRIPT $FunctionPath/iptables_set.sh
+					SOURCE_SCRIPT $FunctionPath/system/iptables_setup.sh
 					SELECT_IPTABLES_FUNCTION
 				else
 					echo "your system is no supported my firewall script"
