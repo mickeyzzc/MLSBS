@@ -1,73 +1,118 @@
-#!/bin/bash
-# -*- coding:utf-8 -*-
+#!/usr/bin/env bash
+#! Encoding UTF-8
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear;
-#��ȡ�ű�·��
-ScriptPath=$(cd $(dirname "$0") && pwd)
-#������������
-source $ScriptPath/config
-#################������ʾ##############################
 cn="false"
 case $LANG in
 	zh_CN*) cn="true";;
 esac
+#获取脚本路劲
+ScriptPath=$(cd $(dirname "$0") && pwd)
+CONFIG_CREATE(){
+	declare -a VarLists
+	declare -a ValueLists
+	declare -a ExplainLists
+	ValueLists=("/var/log" "/usr/local" "/tmp")
+	VarLists=("LogPath" "InstallPath" "DownloadTmp")
+	$cn && ExplainLists=("日志路径" "安装路径" "缓存路径") || ExplainLists=("Logs" "Install" "Download")
+	count=0
+	for var in ${VarLists[@]} ;do
+		$cn &&  TmpMsg="请输入需要生成的${ExplainLists[$count]}." || TmpMsg="Please input the path with ${ExplainLists[$count]}."
+		read -p "$TmpMsg" -t 30 tmpvar
+		eval ${VarLists[$count]}=${tmpvar:-${ValueLists[$count]}}
+		echo "========================================================================="
+		echo "#             ${VarLists[$count]}=${tmpvar:-${ValueLists[$count]}}           #"
+		count=$(expr $count + 1)
+	done
+cat > $ScriptPath/config <<eof
+#! Encoding UTF-8
+#配置参数
+#基础路径
+InstallPath="/usr/local"
+DownloadTmp="/tmp"
+LogPath="/var/log"
+#程序路径
+LibPath="\$ScriptPath/mylib"
+FunctionPath="\$ScriptPath/function"
+TemplatePath="\$ScriptPath/Template"
+MyCronBashPath="\$InstallPath/mybash"
+MyBashLogPath="\$LogPath/mybash"
+Python2Path="\$ScriptPath/py2script"
+#日志路径
+InfoLog=\$LogPath/mlsbs_err\$(date +%Y%m%d).log
+ErrLog=\$LogPath/mlsbs_info\$(date +%Y%m%d).log
+#check system parameter about cpu's core ,ram ,other
+#
+#收集系统的一些基础参数给其他函数使用
+#
+SysName=""
+SysCount=""
+
+egrep -i "centos" /etc/issue && SysName='centos';
+egrep -i "debian" /etc/issue && SysName='debian';
+egrep -i "ubuntu" /etc/issue && SysName='ubuntu';
+
+SysBit='32' && [ \$(getconf WORD_BIT) == '32' ] && [ \$(getconf LONG_BIT) == '64' ] && SysBit='64';
+CpuNum=\$(cat /proc/cpuinfo |grep 'processor'|wc -l);
+RamTotal=$(free -m | grep 'Mem' | awk '{print $2}');
+RamSwap=$(free -m | grep 'Swap' | awk '{print $2}');
+RamSum=\$[\$RamTotal+\$RamSwap];
+FileMax=\$(cat /proc/sys/fs/file-max)
+OSlimit=\$(ulimit -n)
+SysVer=$(uname -r|cut -d. -f1-2)
+eof
+}
+#加载配置内容
+[[ ! -f $ScriptPath/config ]] && CONFIG_CREATE
+source $ScriptPath/config
+#################错误提示##############################
 EXIT_MSG(){
-	$cn && ExitLog="$1" || ExitLog="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitLog " && exit 1
+	$cn && ExitMsg="$1" || ExitMsg="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " && exit 1
 }
-#########��ͨ��־##########
+#########普通日志##########
 INFO_MSG(){
-	$cn && InfoLog="$1" || InfoLog="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoLog "
+	$cn && InfoMsg="$1" || InfoMsg="$2"
+	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoMsg "
 }
-#���ű��ļ��Ƿ���ڲ�����
+#检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){
 for arg do
 	if [ ! -f "$arg" ]; then
-		EXIT_MSG "ȱ���ļ���$arg �������޷����У�����������ԭ����" "not exist $arg,so $0 can not be supported!" 
+		EXIT_MSG "缺少文件：$arg ，程序无法运行，请重新下载原程序！" "not exist $arg,so $0 can not be supported!" 
 	else
-		INFO_MSG "���ڼ��ؿ�: $arg ......" "loading $arg now, continue ......"
+		INFO_MSG "正在加载库: $arg ......" "loading $arg now, continue ......"
 		source $arg
 	fi
 done
 }
+[[ "$SysName" == '' ]] && EXIT_MSG "程序不支持在此系统上运行。" "Your system is not supported this script"
 SOURCE_SCRIPT $LibPath/common
 #main
 SELECT_RUN_SCRIPT(){
-	clear;
-	SOURCE_SCRIPT $FunctionPath/system_base_set.sh
-	echo "[Notice] Which function you want to run:"
-	select var in "Initialize System" "Install nginx" "Install tomcat" "Install Mysql" "Setup firewall" "Install Puppet" "create cron" "Exit";do
+	echo "----------------------------------------------------------------"
+	declare -a VarLists
+	if $cn ;then
+		echo "[Notice] 请选择要运行的指令:"
+		VarLists=("退出" "软件安装" "系统设置" "生成任务")
+	else
+		echo "[Notice] Which function you want to run:"
+		VarLists=("Exit" "Sofeware_Install" "System_Setup" "Create_Cron")
+	fi
+	select var in ${VarLists[@]} ;do
 		case $var in
-			"Initialize System")
-				SELECT_SYSTEM_BASE_FUNCTION;;
-			"Install nginx")
-				SOURCE_SCRIPT $FunctionPath/nginx_install.sh
-				NGINX_VAR && SELECT_NGINX_FUNCTION;;
-			"Install tomcat")
-				SOURCE_SCRIPT $FunctionPath/tomcat_install.sh
-				TOMCAT_VAR && SELECT_TOMCAT_FUNCTION;;
-			"Install Mysql")
-				SOURCE_SCRIPT $FunctionPath/mysql_install.sh
-				MYSQL_VAR && MYSQL_BASE_PACKAGES_INSTALL && INSTALL_MYSQL;;
-			"Setup firewall")
-				if [ ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -ge 13 ];then
-					read -p "wait my script update" -t 5 ok
-				elif [ ${SysVer%%.*} -eq 2 -o ${SysVer%%.*} -eq 3 -a ${SysVer##*.} -le 12 ];then
-					SOURCE_SCRIPT $FunctionPath/iptables_set.sh
-					SELECT_IPTABLES_FUNCTION
-				else
-					echo "your system is no supported my firewall script"
-				fi;;
-			"Install Puppet")
-				SOURCE_SCRIPT $FunctionPath/puppet_install.sh
-				PUPPET_VAR && SELECT_PUPPET_FUNCTION;;
-			"create cron")
-				SOURCE_SCRIPT $FunctionPath/decryption_encryption.sh $FunctionPath/create_cron.sh
+			${VarLists[1]})
+				SOURCE_SCRIPT $FunctionPath/sofeinstall.sh
+				SELECT_SOFE_INSTALL;;
+			${VarLists[2]})
+				SOURCE_SCRIPT $FunctionPath/system_setup.sh
+				SELECT_SYSTEM_SETUP_FUNCTION;;
+			${VarLists[3]})
+				SOURCE_SCRIPT $LibPath/decryption_encryption $FunctionPath/create_cron.sh
 				SELECT_ENCRY_FUNCTION
 				SELECT_CRON_FUNCTION;;
-			"Exit")
+			${VarLists[0]})
 				exit 0;;
 			*)
 				SELECT_RUN_SCRIPT;;

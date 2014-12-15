@@ -1,17 +1,17 @@
-#!/bin/bash
+#! Encoding UTF-8
 shopt -s extglob
 IPTABLES_VAR(){
 	Protocol=
 	MyChain=
 	MyInterface=
-	IpVersion="iptables ip6tables"
+	IptablesTools="iptables ip6tables"
 	IptableStat=
 	SourceNet=
 	SPortRange=
 	DesNet=
 	DPortRange=
 }
-#iptables�Ļ������úͱ���
+#iptables的基本设置和备份
 IPTABLES_BASE_SET(){
 	INSTALL_BASE_PACKAGES iptables
 	[ ! -d $ScriptPath/backup ] && mkdir $ScriptPath/backup
@@ -31,39 +31,35 @@ IPTABLES_BASE_SET(){
 	done
 }
 INTERFACE_CHOOSE(){
-	Interfaces=`ifconfig|awk '!/^ |^$|lo/ {print $1}'`
+	[[ -z "$(which ifconfig)" ]] && Interfaces=$(ip link|awk -F':' '!/^ |lo/ {print $2}'|sed 's/^ //g')|| Interfaces=$(ifconfig|awk '!/^ |^$|lo/ {print $1}')
 	if [ -z "$Interfaces" ] ; then
-		echo "No effective ethernet , please setup the ethernet ."
-		exit 1
+		EXIT_MSG "没有发现已启动的网卡,请启动后再运行此程序." "No effective ethernet , please setup the ethernet ."
 	fi
-	select var in $Interfaces "lo" "all"; do
-		case $var in
-			$var)
-				[ "$var" == "all" ] && MyInterface="" || MyInterface="-i $var"
-				break;;
-		esac
-	done
+	INPUT_CHOOSE $Interfaces "lo" "all"
+	[ -z "$VarTmp" -o "$VarTmp" == "all" ] && MyInterface="" || MyInterface="-i $var"
+
 }
 IPTABLES_CHAINS_CHOOSE(){
 	MyChains="INPUT OUTPUT FORWARD PREROUTING POSTROUTING"
 	INPUT_CHOOSE $MyChains
-	[ -n $VarTmp ] && MyChain=$VarTmp || IPTABLES_CHAINS_CHOOSE
+	[[ -n "$VarTmp" ]] && MyChain=$VarTmp || IPTABLES_CHAINS_CHOOSE
 }
 IPTABLES_PROTOCOL_SET(){
 	Protocols="icmp tcp udp ah udplite sctp dccp"
 	INPUT_CHOOSE $Protocols
-	[ -n "$VarTmp" ] && Protocol="-p $VarTmp" || Protocol=""
+	[[ -n "$VarTmp" ]] && Protocol="-p $VarTmp" || IPTABLES_PROTOCOL_SET
 }
-#������Ҫ��Ч�Ķ˿ں�
+#输入需要有效的端口号
 IPTABLES_SET_PORT(){
 	InputPorts=""
 	InputPort=""
+	$cn && TmpMsg="每次输入完一个端口号后按回车接着输入下一个端口,按'r'或者'R'重置输入,按'a'或者'A'跳过端口号的输入,按'n'或者'N'结束当前输入."  || TmpMsg="For every input port and then press enter to enter another, input 'r' or 'R' reset input, input 'a' of 'A' choose all port, input 'n' of 'N' exit : "
 	while true ;do
-		read -p "For every input port and then press enter to enter another, input 'r' or 'R' reset input, input 'a' of 'A' choose all port, input 'n' of 'N' exit : " InputPort
+		read -p "$TmpMsg" InputPort
 		case $InputPort in
 			[1-9][0-9]*)
 				if [ $InputPort -ge 65535 ];then
-					echo "the port number is illegal, please input again."
+					INFO_MSG "你输入的是非法端口,请重新输入." "the port number is illegal, please input again."
 				else
 					tmp=$InputPorts
 					[ -z "$InputPorts" ] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
@@ -77,33 +73,35 @@ IPTABLES_SET_PORT(){
 			r|R)
 				InputPorts="";;
 			*)
-				echo "input is not number, please input again";;
+				INFO_MSG "你输入的是无效端口,请重新输入" "input is not number, please input again";;
 		esac
-		echo "your port number is $InputPorts"
+		INFO_MSG "你输入的端口号是 : $InputPorts " "your port number is $InputPorts"
 	done
+	$cn && TmpMsg="你要设置的端口号 : $InputPorts "  || TmpMsg="$InputPorts is setup in iptables"
 	#[ -z $InputPorts ] && echo "nothing to do" || IPTABLES_INPUT_SET $InputPorts
-	read -p "$InputPorts is setup in iptables" -t 5 ok
+	read -p "$TmpMsg" -t 5 ok
 }
 IPTABLES_SET_IP(){
 	InputIp=""
 	ext4ip="[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]"
+	$cn && TmpMsg="请输入要有效的IP4地址按回车结束,如果要重新输入请输入一个错误的IP4地址然后回车,请按'n'和'N'跳过输入."  || TmpMsg="Please input a valid IP and then press enter, input err ip to reset input, input 'n' of 'N' exit : "
 	while true ;do
-		read -p "Please input a valid IP and then press enter, input err ip to reset input, input 'n' of 'N' exit : " InputIp
+		read -p "$TmpMsg" InputIp
 		case $InputIp in
 			@($ext4ip).@($ext4ip).@($ext4ip).@($ext4ip))
-				IpVersion="iptables"
+				IptablesTools="iptables"
 				break;;
 			@($ext4ip).@($ext4ip).@($ext4ip).@($ext4ip)-@($ext4ip))
-				IpVersion="iptables"
+				IptablesTools="iptables"
 				break;;
 			@($ext4ip).@($ext4ip).@($ext4ip).@($ext4ip)/@([1-9]|[12][0-9]|3[0-2]))
-				IpVersion="iptables"
+				IptablesTools="iptables"
 				break;;
 			n|N)
 				InputIp=""
 				break;;
 			*)
-				echo "input is not valid ip, please input again";;
+				INFO_MSG "输入的IP地址无效,请重新输入:" "input is not valid ip, please input again";;
 		esac
 	done
 }
@@ -112,7 +110,7 @@ IPTABLES_STATUS_SET(){
 	INPUT_CHOOSE $IpStatus
 	[ -n $VarTmp ] && IptableStat="-j $VarTmp" || IPTABLES_STATUS_SET
 }
-#���ӷ���ǽ�Ĺ���
+#增加防火墙的规则
 IPTABLES_INPUT_SET(){
 	IPTABLES_VAR
 	echo "#############################################"
@@ -131,27 +129,27 @@ IPTABLES_INPUT_SET(){
 	echo "#which source ip are you choose?"
 	echo "#############################################"
 	IPTABLES_SET_IP
-	[ -n "$InputIp" ] && SourceNet="-s $InputIp" || SourceNet=""
+	[[ -n "$InputIp" ]] && SourceNet="-s $InputIp" || SourceNet=""
 	echo "#############################################"
 	echo "#which source port are you choose?"
 	echo "#############################################"
 	IPTABLES_SET_PORT
-	[ -n "$InputPorts" ] && SPortRange="--sport $InputPorts" || SPortRange=""
+	[[ -n "$InputPorts" ]] && SPortRange="--sport $InputPorts" || SPortRange=""
 	echo "#############################################"
 	echo "#which destination ip are you choose?"
 	echo "#############################################"
 	IPTABLES_SET_IP
-	[ -n "$InputIp" ] && DesNet="$InputIp" || DesNet=""
+	[[ -n "$InputIp" ]] && DesNet="$InputIp" || DesNet=""
 	echo "#############################################"
 	echo "#which destination port are you choose?"
 	echo "#############################################"
 	IPTABLES_SET_PORT
-	[ -n "$InputPorts" ] &&	DPortRange="--dport $InputPorts" || DPortRange=""
+	[[ -n "$InputPorts" ]] &&	DPortRange="--dport $InputPorts" || DPortRange=""
 	echo "#############################################"
 	echo "#which status are you choose?"
 	echo "#############################################"
 	IPTABLES_STATUS_SET
-	for var in $IpVersion ; do
+	for var in $IptablesTools ; do
 		if [ "$(echo $SPortRange|grep ',')" -o "$(echo $DPortRange|grep ',')" ] ; then
 			ModuleName="-m multiport"
 			until [ "$Protocol" == "-p tcp" -o "$Protocol" == "-p udp" -o "$Protocol" == "-p udplite" -o "$Protocol" == "-p sctp" -o "$Protocol" == "-p dccp" ] ; do
@@ -169,20 +167,28 @@ IPTABLES_INPUT_SET(){
 }
 SELECT_IPTABLES_FUNCTION(){
 	clear;
-	echo "[Notice]How to set up iptables:"
-	select var in "Check iptables rules and status" "Setup iptables" "Add rules" "Del rules" "back";do
+	echo "----------------------------------------------------------------"
+	declare -a VarLists
+	if $cn ;then
+		echo "[Notice] 请选择需要的功能:"
+		VarLists=("返回首页" "查看防火墙规则" "初始化防火墙默认配置" "增加防火墙的规则" "删除防火墙的规则")
+	else
+		echo "[Notice]How to set up iptables:"
+		VarLists=("back" "Check_iptables_rules_and_status" "Setup_iptables" "Add_rules" "Del_rules")
+	fi
+	select var in ${VarLists[@]} ;do
 		case $var in
-			"Check iptables rules and status")
+			${VarLists[1]})
 				iptables -L -n -v
 				ip6tables -L -n -v
 				PASS_ENTER_TO_EXIT;;
-			"Setup iptables")
+			${VarLists[2]})
 				IPTABLES_BASE_SET;;
-			"Add rules")
+			${VarLists[3]})
 				IPTABLES_INPUT_SET "-A";;
-			"Del rules")
+			${VarLists[4]})
 				IPTABLES_INPUT_SET "-D";;			
-			"back")
+			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;
 		esac
 	done

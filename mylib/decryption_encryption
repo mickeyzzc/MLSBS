@@ -1,0 +1,54 @@
+#! Encoding UTF-8
+ENCRY_GZEXE(){
+	TEST_PROGRAMS gzexe
+	[ $? -eq 0 ] && gzexe $1
+	rm -rf $1~
+}
+SHC_INSTALL(){
+	ShcVersion="shc-3.8.9"
+	INFO_MSG "正在安装 $ShcVersion ..." "Install $ShcVersion ..."
+	cd /tmp/
+	[ ! -f $ShcVersion.tgz ] && wget http://www.datsi.fi.upm.es/~frosal/sources/$ShcVersion.tgz
+	tar vxf /tmp/$ShcVersion.tgz
+	cd /tmp/$ShcVersion
+	TEST_PROGRAMS gcc
+	[ $? -eq 1 ] && INSTALL_BASE_PACKAGES gcc
+	make test
+	make strings
+	make expiration
+	[ ! -d /usr/local/man/man1/ ] && mkdir -p /usr/local/man/man1/
+	make install <<EOP
+y
+EOP
+}
+ENCRY_SHC(){
+	TEST_PROGRAMS shc
+	[ $? -eq 1 ] && SHC_INSTALL
+	CFLAGS=-static shc -r -f $1
+	rm -rf $1 $1~ $1.x.c
+	mv $1.x $1
+}
+SELECT_ENCRY_FUNCTION(){
+	echo "----------------------------------------------------------------"
+	declare -a VarLists
+	if $cn ;then
+		echo "[Notice] 请选择需要你想要加密的方式:"
+		VarLists=("使用gzexe压缩" "使用shc加密" "不加密")
+	else
+		echo "[Notice] How to encryption your script:"
+		VarLists=("Use_gzexe" "Use_shc" "Do_not_encryption")
+	fi
+	select var in ${VarLists[@]} ;do
+		case $var in
+			${VarLists[0]})
+				ENCRY_FUNCTION="ENCRY_GZEXE";;
+			${VarLists[1]})
+				ENCRY_FUNCTION="ENCRY_SHC";;
+			${VarLists[2]})
+				ENCRY_FUNCTION="";;
+			*)
+				SELECT_ENCRY_FUNCTION;;
+		esac
+		break
+	done
+}

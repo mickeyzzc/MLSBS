@@ -1,27 +1,38 @@
-#!/bin/bash
-# -*- coding:utf-8 -*-
+#! Encoding UTF-8
 PASS_ENTER_TO_EXIT(){
-	$cn && InfoMsg="请按回车后退出，否则15秒内自动退出。" || InfoMsg="input enter or wait 15s to exit"
-	read -p "$InfoMsg" -t 15 ok
+	$cn && InfoMsg="请按回车后继续，否则10秒内自动下一步。" || InfoMsg="input enter or wait 10s to continue"
+	read -p "$InfoMsg" -t 10 ok
+	echo ""
 }
 TEST_FILE(){
 	if [ ! -f $1 ];then
-		echo "Not exist $1"
+		INFO_MSG "没有发现 $1 文件" "Not exist $1"
 		PASS_ENTER_TO_EXIT
-		SELECT_RUN_SCRIPT
+		return 1
 	else
-		echo "loading $1 now..."
+		INFO_MSG "正在读取文件 $1" "loading $1 now..."
+		return 0
 	fi
 }
 TEST_PROGRAMS(){
 	for arg do
 		if [ -z $(which $arg) ];then
-			read -p "Your system do not have $arg" -t 10 ok
-			return 0
+			INFO_MSG "系统上缺少程序 $arg" "Your system do not have $arg"
+			return 1
 		else
-			read -p "loading $arg ..." -t 1 ok
+			INFO_MSG "正在加载程序 $arg ..." "loading $arg ..."
+			return 0
 		fi
 	done
+}
+BACK_TO_INDEX(){
+	if [ $? -gt 0 ];then
+		INFO_MSG "准备返回首页" "Ready back to index"
+		PASS_ENTER_TO_EXIT
+		SELECT_RUN_SCRIPT
+	else
+		INFO_MSG "成功，继续下一步。" "succeed , continue ..."
+	fi
 }
 INPUT_CHOOSE(){
 	VarTmp=
@@ -31,6 +42,36 @@ INPUT_CHOOSE(){
 				[ "$vars" == "exit" ] && VarTmp="" || VarTmp="$vars"
 				break;;
 		esac
-		echo "Input again"
+		INFO_MSG "请重新选择." "Input again"
 	done
+}
+#检测是否root账号
+TEST_ROOT(){
+	[[ $(id -u) != '0' ]] && EXIT_MSG "请使用root账号运行此程序." "Please use root to run this script."
+}
+#install some tool
+#
+#这功能可以给其他脚本调用来安装基础软件，如编译mysql需要的gcc等工具
+#
+INSTALL_BASE_PACKAGES(){
+	if [ "$SysName" == 'centos' ]; then
+		echo '[yum-fastestmirror Installing] ************************************************** >>';
+		[ -z $SysCount ] && yum -y install yum-fastestmirror && SysCount="1"
+		cp /etc/yum.conf /etc/yum.conf.back
+		sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
+		for arg do
+			INFO_MSG "正在安装 ${arg} ************************************************** >>" "[${arg} Installing] ************************************************** >>";
+			yum -y install $arg; 
+		done;
+		mv -f /etc/yum.conf.back /etc/yum.conf;
+	else
+		[ -z $SysCount ] && apt-get update && SysCount="1"
+		apt-get -fy install;apt-get -y autoremove --purge;
+		dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
+		for arg do
+			INFO_MSG "正在安装 ${arg} ************************************************** >>" "[${arg} Installing] ************************************************** >>";
+			apt-get install -y $arg --force-yes;
+		done;
+	fi;
+	return 1
 }
