@@ -1,5 +1,8 @@
 #! Encoding UTF-8
 SELECT_SOFE_INSTALL(){
+	SOURCE_SCRIPT $FunctionPath/report_system.sh
+	CPU_VALUES
+	RAM_VALUES
 	echo "----------------------------------------------------------------"
 	declare -a VarLists
 	if $cn ;then

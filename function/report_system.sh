@@ -1,5 +1,4 @@
 #! Encoding UTF-8
-
 CPU_VALUES(){
 	CpuProNum=$(cat /proc/cpuinfo |grep 'processor'|wc -l)
 	CpuPhyNum=$(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)
@@ -20,12 +19,17 @@ CPU_VALUES(){
 			echo "--------------------------------------------------"
 			count=$(expr $count + 1)
 		done
+	elif [[ "$1" == "report" ]];then
+		CpuLoad=($(cat /proc/loadavg | awk '{print $1,$2,$3}'))
+		$cn && echo -n -e "CPU负载(1m):$[${CpuLoad[0]}*100]%\t" || echo -n -e "CPU_Loading(1m):$[${CpuLoad[0]}*100]%\t"
 	fi
 }
 
 RAM_VALUES(){
 	RamTotal=$(free $2 | grep 'Mem' | awk '{print $2}')
 	RamSwap=$(free $2 | grep 'Swap' | awk '{print $2}')
+	RamUsed=$(free $2 | awk '/Mem|Swap/ {used+=$3}END{print used}')
+	RamUse=$(free $2 | awk '/Mem|Swap/ {total+=$2;use+=$4+$6+$8}END{print total-use}')
 	RamSum=$[$RamTotal+$RamSwap]
 	if [[ "$1" == "print" ]];then
 		declare -a VarLists
@@ -41,6 +45,8 @@ RAM_VALUES(){
 			echo "--------------------------------------------------"
 			count=$(expr $count + 1)
 		done
+	elif [[ "$1" == "report" ]];then
+		$cn && echo -n -e "内存总负载:$[$RamUsed/$RamSum]%\t内存程序使用率:$[$RamUse/$RamSum]%\t\n" || echo -n -e "RAM_Loading:$[$RamUsed/$RamSum]%\RAM_using:$[$RamUse/$RamSum]%\t\n"
 	fi
 }
 HDD_VALUES(){
@@ -62,6 +68,9 @@ HDD_VALUES(){
 			echo "--------------------------------------------------"
 			count=$(expr $count + 1)
 		done
+	elif [[ "$1" == "report" ]];then
+		HddIn=$(awk '/pgpgin/{print $2}' /proc/vmstat)
+		HddOut=$(awk '/pgpgout/{print $2}' /proc/vmstat)
 	fi
 }
 NET_VALUES(){
@@ -78,11 +87,22 @@ NET_VALUES(){
 				Ip4=$(ip addr show $var|awk '/inet / {print $2}')
 				Ip6=$(ip addr show $var|awk '/inet6/ {print $2}')
 			else
-				Ip4=$(ifconfig -a $var|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}')
+				Ip4=$(ifconfig -a $var|awk -F'[: ]+' '/inet addr/ {print $4}')
 				Ip6=$(ifconfig -a $var|awk '/inet6 addr/ {print $3}')
 			fi
 			echo -e "${InterfacesLists[$count]} :\n\t ipv4 = $Ip4 \n\t ipv6 = $Ip6"
 			echo "--------------------------------------------------"
+			count=$(expr $count + 1)
+		done
+	elif [[ "$1" == "report" ]];then
+		count=0
+		for var in ${InterfacesLists[@]} ;do
+			NetParkets=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $4,$12}'))
+			NetBytes=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $3,$11}'))
+			eval ${TmpInBytesLists[$count]}=${NetBytes[0]}
+			eval ${TmpOutBytesLists[$count]}=${NetBytes[1]}
+			eval ${TmpInParketsLists[$count]}=${NetBytes[0]}
+			eval ${TmpOutParketsLists[$count]}=${NetBytes[1]}
 			count=$(expr $count + 1)
 		done
 	fi
@@ -114,10 +134,10 @@ SELECT_REPORT_CREATE(){
 	declare -a VarLists
 	if $cn ;then
 		echo "[Notice] 请选择需要生成的报告:"
-		VarLists=("返回首页" "打印系统简报" "输出系统目前负载")
+		VarLists=("返回首页" "打印系统简报" "输出系统目前负载" "输出网络负载")
 	else
 		echo "[Notice] Which report created:"
-		VarLists=("back" "Print_system's_report" "Echo_System_loading")
+		VarLists=("back" "Print_system's_report" "Echo_System_loading" "Echo_Network_loading")
 	fi
 	select var in ${VarLists[@]} ;do
 		case $var in
@@ -130,6 +150,11 @@ SELECT_REPORT_CREATE(){
 				NET_VALUES print
 				;;
 			${VarLists[2]})
+				while true ;do
+					CPU_VALUES report
+					RAM_VALUES report
+				done;;
+			${VarLists[3]})
 				echo "Nothing to do";;
 			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;

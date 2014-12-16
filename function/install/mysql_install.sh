@@ -50,8 +50,8 @@ datadir		= $MysqlDataPath
 bind-address	= 0.0.0.0
 skip-name-resolve
 skip-external-locking
-thread_concurrency	= `expr $CpuNum \* 2`
-max_connections	= `expr $FileMax \* $CpuNum \* 2 / $RamTotal`
+thread_concurrency	= `expr $CpuProNum \* 2`
+max_connections	= `expr $FileMax \* $CpuProNum \* 2 / $RamTotal`
 max_connect_errors	= 30
 table_open_cache	= `expr $RamTotal + $RamSwap`
 max_allowed_packet	= `expr $RamTotal \* 2 / 1000`M
@@ -61,7 +61,7 @@ sort_buffer_size	= `expr $RamTotal \* 2 / 1000`M
 join_buffer_size	= `expr $RamTotal \* 2 / 1000`M
 query_cache_size	= `expr $RamTotal / 100`M
 thread_cache_size	= 30
-thread_concurrency	= `expr $CpuNum \* 4`
+thread_concurrency	= `expr $CpuProNum \* 4`
 connect_timeout		= 1200
 wait_timeout		= 1200
 general_log	= 1
@@ -78,13 +78,13 @@ default_storage_engine	= InnoDB
 innodb_buffer_pool_size	= `expr $RamTotal / 100`M
 innodb_log_buffer_size	= 8M
 innodb_file_per_table	= 1
-innodb_open_files	= `expr $FileMax \* $CpuNum / $RamTotal`
-innodb_io_capacity	= `expr $FileMax \* $CpuNum / $RamTotal`
+innodb_open_files	= `expr $FileMax \* $CpuProNum / $RamTotal`
+innodb_io_capacity	= `expr $FileMax \* $CpuProNum / $RamTotal`
 innodb_flush_method	= O_DIRECT
 
 !includedir $MysqlConfigPath/conf.d
 [mysqld_safe]
-open_files_limit	= `expr $FileMax / $CpuNum / 100`
+open_files_limit	= `expr $FileMax / $CpuProNum / 100`
 [isamchk]
 key_buffer		= 16M
 [mysqldump]
