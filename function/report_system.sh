@@ -16,12 +16,13 @@ CPU_VALUES(){
 		count=0
 		for var in ${VarLists[@]}; do
 			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
-			echo "--------------------------------------------------"
+			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	elif [[ "$1" == "report" ]];then
 		CpuLoad=($(cat /proc/loadavg | awk '{print $1,$2,$3}'))
-		$cn && echo -n -e "CPU负载(1m):$[${CpuLoad[0]}*100]%\t" || echo -n -e "CPU_Loading(1m):$[${CpuLoad[0]}*100]%\t"
+		CpuLoad1m=$(echo ${CpuLoad[0]}*100|bc)
+		$cn && echo -n -e "CPU负载(1m):${CpuLoad1m%%.*}%\t" || echo -n -e "CPU_Loading(1m):${CpuLoad1m%%.*}%\t"
 	fi
 }
 
@@ -42,11 +43,11 @@ RAM_VALUES(){
 		count=0
 		for var in ${VarLists[@]} ;do
 			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
-			echo "--------------------------------------------------"
+			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	elif [[ "$1" == "report" ]];then
-		$cn && echo -n -e "内存总负载:$[$RamUsed/$RamSum]%\t内存程序使用率:$[$RamUse/$RamSum]%\t\n" || echo -n -e "RAM_Loading:$[$RamUsed/$RamSum]%\RAM_using:$[$RamUse/$RamSum]%\t\n"
+		$cn && echo -n -e "内存总负载:$(echo ${RamUsed}*100/${RamSum}|bc)%\t内存程序使用率:$(echo ${RamUse}*100/${RamSum}|bc)%\t" || echo -n -e "RAM_Loading:$(echo ${{RamUsed}}*100/${RamSum}|bc)%\tRAM_using:$(echo ${RamUse}*100/${RamSum}|bc)%\t"
 	fi
 }
 HDD_VALUES(){
@@ -65,10 +66,10 @@ HDD_VALUES(){
 		count=0
 		for var in ${HddPartition[@]} ;do
 			echo -e "${HddPartition[$count]} :\n\t ${HddVolume[$count]}"
-			echo "--------------------------------------------------"
+			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
-	elif [[ "$1" == "report" ]];then
+	elif [[ "$2" == "report" ]];then
 		HddIn=$(awk '/pgpgin/{print $2}' /proc/vmstat)
 		HddOut=$(awk '/pgpgout/{print $2}' /proc/vmstat)
 	fi
@@ -91,7 +92,7 @@ NET_VALUES(){
 				Ip6=$(ifconfig -a $var|awk '/inet6 addr/ {print $3}')
 			fi
 			echo -e "${InterfacesLists[$count]} :\n\t ipv4 = $Ip4 \n\t ipv6 = $Ip6"
-			echo "--------------------------------------------------"
+			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	elif [[ "$1" == "report" ]];then
@@ -99,10 +100,10 @@ NET_VALUES(){
 		for var in ${InterfacesLists[@]} ;do
 			NetParkets=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $4,$12}'))
 			NetBytes=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $3,$11}'))
-			eval ${TmpInBytesLists[$count]}=${NetBytes[0]}
-			eval ${TmpOutBytesLists[$count]}=${NetBytes[1]}
-			eval ${TmpInParketsLists[$count]}=${NetBytes[0]}
-			eval ${TmpOutParketsLists[$count]}=${NetBytes[1]}
+			eval ${InBytesLists[$count]}=${NetBytes[0]}
+			eval ${OutBytesLists[$count]}=${NetBytes[1]}
+			eval ${InParketsLists[$count]}=${NetBytes[0]}
+			eval ${OutParketsLists[$count]}=${NetBytes[1]}
 			count=$(expr $count + 1)
 		done
 	fi
@@ -123,7 +124,7 @@ SYSTEM_PARAMETER(){
 		count=0
 		for var in ${VarLists[@]}; do
 			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
-			echo "--------------------------------------------------"
+			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	fi
@@ -150,12 +151,43 @@ SELECT_REPORT_CREATE(){
 				NET_VALUES print
 				;;
 			${VarLists[2]})
+				$cn && echo "输入任意键后按回车退出" || echo "Input some key and put enter to exit."
+				echo "_______________________________"
+				HDD_VALUES -a report
+				HddInTmp=$HddIn
+				HddOutTmp=$HddOut
 				while true ;do
 					CPU_VALUES report
 					RAM_VALUES report
+					HDD_VALUES -a report
+					$cn && echo -n -e "硬盘写入:$[$HddIn-$HddInTmp]\t硬盘读取:$[$HddOut-$HddOutTmp]\t\n" || echo -n -e "HDD IN:$[$HddIn-$HddInTmp]\tHDD OUT:$[$HddOut-$HddOutTmp]\t\n"
+					HddInTmp=$HddIn
+					HddOutTmp=$HddOut
+					read -t 10 ok
+					[[ -n "$ok" ]] && break
 				done;;
 			${VarLists[3]})
-				echo "Nothing to do";;
+				$cn && echo "输入任意键后按回车退出" || echo "Input some key and put enter to exit."
+				echo "_______________________________"
+				NET_VALUES report
+				eval TmpInBytesLists=${InBytesLists[@]}
+				eval TmpOutBytesLists=${OutBytesLists[@]}
+				eval TmpInParketsLists=${InParketsLists[@]}
+				eval TmpOutParketsLists=${OutParketsLists[@]}
+				while true; do
+					count=0
+					for var in ${InterfacesLists[@]} ;do
+						$cn && echo -n -e "${var}流入(bytes):$[${InBytesLists[$count]}-${TmpInBytesLists[$count]}\t${var}流出(bytes):$[${OutBytesLists[$count]}-${TmpOutBytesLists[$count]}\t\n" || echo -n -e "HDD IN:$[$HddIn-$HddInTmp]\tHDD OUT:$[$HddOut-$HddOutTmp]\t\n"
+						count=$(expr $count + 1)
+					done
+					eval TmpInBytesLists=${InBytesLists[@]}
+					eval TmpOutBytesLists=${OutBytesLists[@]}
+					eval TmpInParketsLists=${InParketsLists[@]}
+					eval TmpOutParketsLists=${OutParketsLists[@]}
+					read -t 10 ok
+					[[ -n "$ok" ]] && break
+				done
+				;;
 			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;
 		esac
