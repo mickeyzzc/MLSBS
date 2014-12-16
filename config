@@ -19,7 +19,8 @@ ErrLog=$LogPath/mlsbs_info$(date +%Y%m%d).log
 #
 SysName=""
 SysCount=""
-
+FileMax=$(cat /proc/sys/fs/file-max)
+OSlimit=$(ulimit -n)
 egrep -i "centos" /etc/issue && SysName='centos'
 egrep -i "debian" /etc/issue && SysName='debian'
 egrep -i "ubuntu" /etc/issue && SysName='ubuntu'
