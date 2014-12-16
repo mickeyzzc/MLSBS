@@ -52,15 +52,8 @@ SysCount=""
 egrep -i "centos" /etc/issue && SysName='centos';
 egrep -i "debian" /etc/issue && SysName='debian';
 egrep -i "ubuntu" /etc/issue && SysName='ubuntu';
-
-SysBit='32' && [ \$(getconf WORD_BIT) == '32' ] && [ \$(getconf LONG_BIT) == '64' ] && SysBit='64';
-CpuNum=\$(cat /proc/cpuinfo |grep 'processor'|wc -l);
-RamTotal=$(free -m | grep 'Mem' | awk '{print $2}');
-RamSwap=$(free -m | grep 'Swap' | awk '{print $2}');
-RamSum=\$[\$RamTotal+\$RamSwap];
-FileMax=\$(cat /proc/sys/fs/file-max)
-OSlimit=\$(ulimit -n)
 SysVer=$(uname -r|cut -d. -f1-2)
+SysBit='32' && [ \$(getconf WORD_BIT) == '32' ] && [ \$(getconf LONG_BIT) == '64' ] && SysBit='64';
 eof
 }
 #加载配置内容
@@ -69,12 +62,12 @@ source $ScriptPath/config
 #################错误提示##############################
 EXIT_MSG(){
 	$cn && ExitMsg="$1" || ExitMsg="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " && exit 1
+	echo -e "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " |tee -a $ErrLog && exit 1
 }
 #########普通日志##########
 INFO_MSG(){
 	$cn && InfoMsg="$1" || InfoMsg="$2"
-	echo "$(date +%Y-%m-%d-%H:%M) -INFO $InfoMsg "
+	echo -e "$(date +%Y-%m-%d-%H:%M) -INFO $InfoMsg " |tee -a $InfoLog
 }
 #检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){
