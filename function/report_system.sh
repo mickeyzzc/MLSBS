@@ -1,4 +1,9 @@
 #! Encoding UTF-8
+REPORT_MSG(){
+	echo "_______________________________"
+	$cn && echo "10秒取值一次,请耐心等待.输入任意键后按回车退出;如果你等不及,可以不按任何键的情况下直接按回车立即取值输出." || echo "A value of 10's, please be patient.Input some key and put enter to exit.If you can't wait, you can not directly under the condition of press any key and press enter output value immediately."
+	echo "_______________________________"
+}
 CPU_VALUES(){
 	CpuProNum=$(cat /proc/cpuinfo |grep 'processor'|wc -l)
 	CpuPhyNum=$(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)
@@ -51,10 +56,6 @@ RAM_VALUES(){
 	fi
 }
 HDD_VALUES(){
-	declare -a HddPartition
-	declare -a HddVolume
-	declare -a HddUsed
-	declare -a HddUsable
 	HddVolume=($(df -P $1 |awk '/^\/dev/ {print $2}'))
 	HddPartition=($(df -P $1 |awk '/^\/dev/ {print $NF}'))
 	HddUsed=($(df -P $1 |awk '/^\/dev/ {print $3}'))
@@ -75,7 +76,6 @@ HDD_VALUES(){
 	fi
 }
 NET_VALUES(){
-	declare -a InterfacesLists
 	[[ -z "$(which ifconfig)" ]] && InterfacesLists=($(ip link|awk -F':' '!/^ |lo/ {print $2}'|sed 's/^ //g'))|| InterfacesLists=($(ifconfig|awk '!/^ |^$|lo/ {print $1}'))
 	[[ -z "$InterfacesLists" ]] && INFO_MSG "没有有效的网络配置" "No valid networks" 
 	if [[ "$1" == "print" ]];then
@@ -96,15 +96,17 @@ NET_VALUES(){
 			count=$(expr $count + 1)
 		done
 	elif [[ "$1" == "report" ]];then
-		count=0
+		i=0
+		declare -a NetParkets
+		declare -a NetBytes
 		for var in ${InterfacesLists[@]} ;do
 			NetParkets=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $4,$12}'))
 			NetBytes=($(grep "$var" /proc/net/dev|awk -F'[: ]+' 'BEGIN{ORS=" "}{print $3,$11}'))
-			eval ${InBytesLists[$count]}=${NetBytes[0]}
-			eval ${OutBytesLists[$count]}=${NetBytes[1]}
-			eval ${InParketsLists[$count]}=${NetBytes[0]}
-			eval ${OutParketsLists[$count]}=${NetBytes[1]}
-			count=$(expr $count + 1)
+			InBytesLists[$i]=${NetBytes[0]}
+			OutBytesLists[$i]=${NetBytes[1]}
+			InParketsLists[$i]=${NetParkets[0]}
+			OutParketsLists[$i]=${NetParkets[1]}
+			i=$(expr $i + 1)
 		done
 	fi
 }
@@ -151,8 +153,7 @@ SELECT_REPORT_CREATE(){
 				NET_VALUES print
 				;;
 			${VarLists[2]})
-				$cn && echo "输入任意键后按回车退出" || echo "Input some key and put enter to exit."
-				echo "_______________________________"
+				REPORT_MSG
 				HDD_VALUES -a report
 				HddInTmp=$HddIn
 				HddOutTmp=$HddOut
@@ -167,30 +168,34 @@ SELECT_REPORT_CREATE(){
 					[[ -n "$ok" ]] && break
 				done;;
 			${VarLists[3]})
-				$cn && echo "输入任意键后按回车退出" || echo "Input some key and put enter to exit."
-				echo "_______________________________"
+				declare -a TmpInBytesLists
+				declare -a TmpOutBytesLists
+				declare -a TmpInParketsLists
+				declare -a TmpOutParketsLists
+				REPORT_MSG
 				NET_VALUES report
-				eval TmpInBytesLists=${InBytesLists[@]}
-				eval TmpOutBytesLists=${OutBytesLists[@]}
-				eval TmpInParketsLists=${InParketsLists[@]}
-				eval TmpOutParketsLists=${OutParketsLists[@]}
-				while true; do
+				TmpInBytesLists=(${InBytesLists[@]})
+				TmpOutBytesLists=(${OutBytesLists[@]})
+				TmpInParketsLists=(${InParketsLists[@]})
+				TmpOutParketsLists=(${OutParketsLists[@]})
+				while true ; do
 					count=0
+					NET_VALUES report
 					for var in ${InterfacesLists[@]} ;do
-						$cn && echo -n -e "${var}流入(bytes):$[${InBytesLists[$count]}-${TmpInBytesLists[$count]}\t${var}流出(bytes):$[${OutBytesLists[$count]}-${TmpOutBytesLists[$count]}\t\n" || echo -n -e "HDD IN:$[$HddIn-$HddInTmp]\tHDD OUT:$[$HddOut-$HddOutTmp]\t\n"
+						$cn && echo -n -e "$var 流入(bytes):$[${InBytesLists[$count]}-${TmpInBytesLists[$count]}]\t$var 流出(bytes):$[${OutBytesLists[$count]}-${TmpOutBytesLists[$count]}]\t" || echo -n -e "$var In(bytes):$[${InBytesLists[$count]}-${TmpInBytesLists[$count]}]\t$var Out(bytes):$[${OutBytesLists[$count]}-${TmpOutBytesLists[$count]}]\t"
+						$cn && echo -n -e "$var 流入(包):$[${InParketsLists[$count]}-${TmpInParketsLists[$count]}]\t$var 流出(包):$[${OutParketsLists[$count]}-${TmpOutParketsLists[$count]}]\t\n" || echo -n -e "$var In(parkets):$[${InParketsLists[$count]}-${TmpInParketsLists[$count]}]\t$var Out(parkets):$[${OutParketsLists[$count]}-${TmpOutParketsLists[$count]}]\t\n"
 						count=$(expr $count + 1)
 					done
-					eval TmpInBytesLists=${InBytesLists[@]}
-					eval TmpOutBytesLists=${OutBytesLists[@]}
-					eval TmpInParketsLists=${InParketsLists[@]}
-					eval TmpOutParketsLists=${OutParketsLists[@]}
+					TmpInBytesLists=(${InBytesLists[@]})
+					TmpOutBytesLists=(${OutBytesLists[@]})
+					TmpInParketsLists=(${InParketsLists[@]})
+					TmpOutParketsLists=(${OutParketsLists[@]})
+					echo "-----------------------"
 					read -t 10 ok
 					[[ -n "$ok" ]] && break
-				done
-				;;
+				done;;
 			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;
 		esac
 	done
 }
-
