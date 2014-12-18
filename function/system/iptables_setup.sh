@@ -32,7 +32,7 @@ IPTABLES_BASE_SET(){
 }
 INTERFACE_CHOOSE(){
 	[[ -z "$(which ifconfig)" ]] && Interfaces=$(ip link|awk -F':' '!/^ |lo/ {print $2}'|sed 's/^ //g')|| Interfaces=$(ifconfig|awk '!/^ |^$|lo/ {print $1}')
-	if [ -z "$Interfaces" ] ; then
+	if [[ -z "$Interfaces" ]] ; then
 		EXIT_MSG "没有发现已启动的网卡,请启动后再运行此程序." "No effective ethernet , please setup the ethernet ."
 	fi
 	INPUT_CHOOSE $Interfaces "lo" "all"
@@ -58,11 +58,11 @@ IPTABLES_SET_PORT(){
 		read -p "$TmpMsg" InputPort
 		case $InputPort in
 			[1-9][0-9]*)
-				if [ $InputPort -ge 65535 ];then
+				if [[ $InputPort -ge 65535 ]];then
 					INFO_MSG "你输入的是非法端口,请重新输入." "the port number is illegal, please input again."
 				else
 					tmp=$InputPorts
-					[ -z "$InputPorts" ] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
+					[[ -z "$InputPorts" ]] && InputPorts=$InputPort || InputPorts=$InputPort,$tmp
 				fi
 				;;
 			a|A)
@@ -108,7 +108,7 @@ IPTABLES_SET_IP(){
 IPTABLES_STATUS_SET(){
 	IpStatus="ACCEPT DROP"
 	INPUT_CHOOSE $IpStatus
-	[ -n $VarTmp ] && IptableStat="-j $VarTmp" || IPTABLES_STATUS_SET
+	[[ -n $VarTmp ]] && IptableStat="-j $VarTmp" || IPTABLES_STATUS_SET
 }
 #增加防火墙的规则
 IPTABLES_INPUT_SET(){

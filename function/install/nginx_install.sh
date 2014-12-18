@@ -33,9 +33,9 @@ NGINX_CONF_SET(){
 	[ -f $NginxPath/conf/nginx.conf ] && cp $NginxPath/conf/nginx.conf $NginxPath/conf/nginx.conf.backup$(date +%Y%m%d%H%M)
 cat >$NginxPath/conf/nginx.conf <<EOF
 user www-data;
-worker_processes $CpuNum;
+worker_processes $CpuProNum;
 events {
-    worker_connections  `expr $CpuNum \* 2048`;
+    worker_connections  `expr $CpuProNum \* 2048`;
 }
 http {
     include mime.types;
