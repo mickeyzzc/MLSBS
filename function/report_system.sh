@@ -20,14 +20,24 @@ CPU_VALUES(){
 		echo "--------------------------------------"
 		count=0
 		for var in ${VarLists[@]}; do
-			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
+			echo -e "${VarLists[$count]} :\t ${ValueLists[$count]}"
 			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	elif [[ "$1" == "report" ]];then
+		declare -a CpuLoad 
+		declare -a CpuLoadIntArr
 		CpuLoad=($(cat /proc/loadavg | awk '{print $1,$2,$3}'))
-		CpuLoad1m=$(echo ${CpuLoad[0]}*100|bc)
-		$cn && echo -n -e "CPU负载(1m):${CpuLoad1m%%.*}%\t" || echo -n -e "CPU_Loading(1m):${CpuLoad1m%%.*}%\t"
+		count=0
+		$cn && echo -n -e "CPU负载(1m,5m,15m):" || echo -n -e "CPU_Loading(1m,5m,15m):"
+		for var in ${CpuLoad[@]} ; do
+			[[  "$count" -eq "0" ]] || echo -n ","
+			CpuLoadInt=$(echo ${CpuLoad[$count]}*100|bc)
+			CpuLoadIntArr[$count]=${CpuLoadInt%%.*}
+			echo -n "${CpuLoadIntArr[$count]}%"
+			count=$(expr $count + 1)
+		done
+		echo -e -n "\t"
 	fi
 }
 
@@ -36,6 +46,8 @@ RAM_VALUES(){
 	RamSwap=$(free $2 | grep 'Swap' | awk '{print $2}')
 	RamUsed=$(free $2 | awk '/Mem|Swap/ {used+=$3}END{print used}')
 	RamUse=$(free $2 | awk '/Mem|Swap/ {total+=$2;use+=$4+$6+$8}END{print total-use}')
+	declare Ram
+	[[ "$2" == "-m" ]] && Ram="MB" || Ram="KB"
 	RamSum=$[$RamTotal+$RamSwap]
 	if [[ "$1" == "print" ]];then
 		declare -a VarLists
@@ -47,12 +59,12 @@ RAM_VALUES(){
 		echo "--------------------------------------"
 		count=0
 		for var in ${VarLists[@]} ;do
-			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
-			echo "_______________________________"
+			echo -e -n "${VarLists[$count]} : ${ValueLists[$count]}$Ram |\t"	
 			count=$(expr $count + 1)
 		done
+		echo -e "\n_______________________________\n"
 	elif [[ "$1" == "report" ]];then
-		$cn && echo -n -e "内存总负载:$(echo ${RamUsed}*100/${RamSum}|bc)%\t内存程序使用率:$(echo ${RamUse}*100/${RamSum}|bc)%\t" || echo -n -e "RAM_Loading:$(echo ${{RamUsed}}*100/${RamSum}|bc)%\tRAM_using:$(echo ${RamUse}*100/${RamSum}|bc)%\t"
+		$cn && echo -n -e "内存负载\使用率:$(echo ${RamUsed}*100/${RamSum}|bc)%\\$(echo ${RamUse}*100/${RamSum}|bc)%\t" || echo -n -e "(RAM Loading\Using):$(echo ${RamUsed}*100/${RamSum}|bc)%\\$(echo ${RamUse}*100/${RamSum}|bc)%\t"
 	fi
 }
 HDD_VALUES(){
@@ -66,13 +78,13 @@ HDD_VALUES(){
 		echo "--------------------------------------"
 		count=0
 		for var in ${HddPartition[@]} ;do
-			echo -e "${HddPartition[$count]} :\n\t ${HddVolume[$count]}"
+			echo -e "${HddPartition[$count]} : ${HddVolume[$count]}"
 			echo "_______________________________"
 			count=$(expr $count + 1)
 		done
 	elif [[ "$2" == "report" ]];then
-		HddIn=$(awk '/pgpgin/{print $2}' /proc/vmstat)
-		HddOut=$(awk '/pgpgout/{print $2}' /proc/vmstat)
+		HddIn=$(awk '/pgpgin|pswpin/ {myin+=$2}END{print myin}' /proc/vmstat)
+		HddOut=$(awk '/pgpgout|pswpout/ {myout+=$2}END{print myout}' /proc/vmstat)
 	fi
 }
 NET_VALUES(){
@@ -125,10 +137,10 @@ SYSTEM_PARAMETER(){
 		echo "--------------------------------------"
 		count=0
 		for var in ${VarLists[@]}; do
-			echo -e "${VarLists[$count]} :\n\t ${ValueLists[$count]}"
-			echo "_______________________________"
+			echo -e -n "${VarLists[$count]} : ${ValueLists[$count]} |\t"
 			count=$(expr $count + 1)
 		done
+		echo -e "\n_______________________________\n"
 	fi
 }
 SELECT_REPORT_CREATE(){
@@ -154,16 +166,18 @@ SELECT_REPORT_CREATE(){
 				;;
 			${VarLists[2]})
 				REPORT_MSG
+				declare TmpHddIn
+				declare TmpHddOut
 				HDD_VALUES -a report
-				HddInTmp=$HddIn
-				HddOutTmp=$HddOut
+				TmpHddIn=$HddIn
+				TmpHddOut=$HddOut
 				while true ;do
 					CPU_VALUES report
 					RAM_VALUES report
 					HDD_VALUES -a report
-					$cn && echo -n -e "硬盘写入:$[$HddIn-$HddInTmp]\t硬盘读取:$[$HddOut-$HddOutTmp]\t\n" || echo -n -e "HDD IN:$[$HddIn-$HddInTmp]\tHDD OUT:$[$HddOut-$HddOutTmp]\t\n"
-					HddInTmp=$HddIn
-					HddOutTmp=$HddOut
+					$cn && echo -n -e " 硬盘写入\读取:$[$HddIn-$TmpHddIn]\\$[$HddOut-$TmpHddOut]\n" || echo -n -e " HDD(WRITE\READ):$[$HddIn-$TmpHddIn]\\$[$HddOut-$TmpHddOut]\n"
+					TmpHddIn=$HddIn
+					TmpHddOut=$HddOut
 					read -t 10 ok
 					[[ -n "$ok" ]] && break
 				done;;
