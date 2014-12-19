@@ -5,7 +5,6 @@ CRON_VARS(){
 	CronTime=""
 	MyBashLogPathTmp=$(echo $MyBashLogPath|sed 's/\//\\\//g')
 }
-[ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 CRON_CREATE(){
 	grep "$CronCmd" /etc/crontab > /dev/null
 	if [ $? -gt 0 ];then
@@ -50,6 +49,7 @@ CRON_FOR_SYSTEM_CHECK(){
 }
 SELECT_CRON_FUNCTION(){
 	CRON_VARS
+	[ ! -d $MyCronBashPath ] && mkdir -p $MyCronBashPath
 	echo "----------------------------------------------------------------"
 	declare -a VarLists
 	if $cn ;then
