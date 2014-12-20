@@ -53,7 +53,7 @@ eof
 }
 PYTHON_TOOL_CREATE
 if [ $? = 0 ];then
-	$cn && echo "程序文件已生成完毕,使用方法如下:" || echo "Program files generated, using method is as follows:"
+	$cn && echo "程序文件已生成完毕,路径是\"$PyToolsPath/\",使用方法如下:" || echo "Program files generated, Path:\"$PyToolsPath/\", using method is as follows:"
 	echo "================================"
 	python $PyTool --version
 	python $PyTool -h
