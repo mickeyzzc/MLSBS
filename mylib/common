@@ -92,6 +92,7 @@ INSTALL_BASE_CMD(){
 PACKET_TOOLS(){
 	declare CmdScript
 	declare InstallToolsScript
+	declare TmpCmdScript
 	INFO_MSG "正在打包,请稍后..." "Are packaged, please later..."
 	CmdScript="$1"
 	InstallToolsScript="$2"
@@ -100,7 +101,8 @@ PACKET_TOOLS(){
 	TEST_FILE "$CmdScript"
 	TEST_FILE "$InstallToolsScript"
 	[[ ! -d $ScriptPath/packet ]] && mkdir -p $ScriptPath/packet
-	cd "$(dirname $CmdScript)" && gzexe "$(basename $CmdScript)" && tar -zcf "$(basename $CmdScript)" "$(basename $CmdScript)" && cat $InstallToolsScript "$(basename $CmdScript)" > $ScriptPath/packet/$(basename $InstallToolsScript) && cd $ScriptPath/packet/ && gzexe $(basename $InstallToolsScript) || EXIT_LOG "程序生成失败!" "The corresponding create false!"
-	INFO_MSG "安装包已生成,路径为:${ScriptPath}/packet/${InstallToolsScript}" "The installation package has been generated, the path is : ${ScriptPath}/packet/${InstallToolsScript}"
-	exit 0
+	cp $CmdScript $ScriptPath/packet/
+	TmpCmdScript=$(basename $CmdScript)
+	cd "$ScriptPath/packet/" && gzexe "$TmpCmdScript" && tar -zcf "${TmpCmdScript%%.*}" "$TmpCmdScript" && cat $InstallToolsScript "${TmpCmdScript%%.*}" > $ScriptPath/packet/$(basename $InstallToolsScript) && cd $ScriptPath/packet/ && gzexe $(basename $InstallToolsScript) || EXIT_MSG "程序生成失败!" "The corresponding create false!"
+	INFO_MSG "安装包已生成,路径为:${ScriptPath}/packet/$(basename $InstallToolsScript)" "The installation package has been generated, the path is : ${ScriptPath}/packet/$(basename $InstallToolsScript)"
 }

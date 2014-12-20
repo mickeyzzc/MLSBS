@@ -30,7 +30,9 @@ SELECT_TOOLS_CREATE(){
 				count=0
 				for i in ${VarLists[@]};do
 					if [[ "$i" == "$var" ]];then
-						PACKET_TOOLS "${ToolsScript[$count]}" "${InstallScript[$count]}"
+						sed "s/@PyTools/$(basename ${ToolsScript[$count]})/g" "${InstallScript[$count]}" > $DownloadTmp/$(basename ${InstallScript[$count]})
+						PACKET_TOOLS "${ToolsScript[$count]}" "$DownloadTmp/$(basename ${InstallScript[$count]})"
+						rm -rf "$DownloadTmp/$(basename ${InstallScript[$count]})"
 						break
 					fi
 					count=$(expr $count + 1)

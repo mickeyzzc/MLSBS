@@ -9,6 +9,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 clear
 ScriptPath=$(cd $(dirname "$0") && pwd)
+PyTools="@PyTools"
 cn="false"
 case $LANG in
 	zh_CN*) cn="true";;
@@ -26,8 +27,7 @@ done
 PYTHON_TOOL_CREATE(){
 	$cn && echo "正在生成程序文件,请稍等..." || echo "Program files is creating, please wait a moment..."
 	PyToolsPath=$(tail -n +$HeadLines $0 | tar -zxf - |pwd) && echo $PyToolsPath
-	PyTools=$(tail -n +$HeadLines $0 | tar -zxf - ) && echo $PyTools
-	cd $PyToolsPath && gzexe -d $PyTools && python -m py_compile $PyTools && mv $PyToolsPath/$PyToolsc $PyToolsPath/sendmail && PyTool=$PyToolsPath/sendmail && rm -rf $PyToolsPath/$PyTools* || EXIT_LOG "程序生成失败!" "The corresponding create false!"
+	cd $PyToolsPath && gzexe -d $PyTools &&	python -m py_compile $PyTools && mv $PyToolsPath/${PyTools}c $PyToolsPath/sendmail && PyTool=$PyToolsPath/sendmail && rm -rf $PyToolsPath/${PyTools}* || EXIT_LOG "程序生成失败!" "The corresponding create false!"
 	if [ ! -f $PyToolsPath/sendmail.conf ] ;then
 		$cn && echo "程序文件已生成,正在生成配置文件,请输入相关信息." || echo "Program is created , Now Generating configuration files, please input the relevant information."
 		read -p "input mail's username :" MailUserName
