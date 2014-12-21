@@ -5,7 +5,7 @@ PASS_ENTER_TO_EXIT(){
 	echo ""
 }
 TEST_FILE(){
-	if [ ! -f $1 ];then
+	if [[ ! -f $1 ]];then
 		INFO_MSG "没有发现 $1 文件" "Not exist $1"
 		PASS_ENTER_TO_EXIT
 		return 1
@@ -16,7 +16,7 @@ TEST_FILE(){
 }
 TEST_PROGRAMS(){
 	for arg do
-		if [ -z $(which $arg) ];then
+		if [[ -z $(which $arg) ]];then
 			INFO_MSG "系统上缺少程序 $arg" "Your system do not have $arg"
 			return 1
 		else
@@ -26,7 +26,7 @@ TEST_PROGRAMS(){
 	done
 }
 BACK_TO_INDEX(){
-	if [ $? -gt 0 ];then
+	if [[ $? -gt 0 ]];then
 		INFO_MSG "准备返回首页" "Ready back to index"
 		PASS_ENTER_TO_EXIT
 		SELECT_RUN_SCRIPT
@@ -39,7 +39,7 @@ INPUT_CHOOSE(){
 	select vars in $@ "exit"; do
 		case $vars in
 			$vars)
-				[ "$vars" == "exit" ] && VarTmp="" || VarTmp="$vars"
+				[[ "$vars" == "exit" ]] && VarTmp="" || VarTmp="$vars"
 				break;;
 		esac
 		INFO_MSG "请重新选择." "Input again"
@@ -54,9 +54,9 @@ TEST_ROOT(){
 #这功能可以给其他脚本调用来安装基础软件，如编译mysql需要的gcc等工具
 #
 INSTALL_BASE_PACKAGES(){
-	if [ "$SysName" == 'centos' ]; then
+	if [[ "$SysName" == 'centos' ]]; then
 		echo '[yum-fastestmirror Installing] ************************************************** >>';
-		[ -z $SysCount ] && yum -y install yum-fastestmirror && SysCount="1"
+		[[ -z $SysCount ]] && yum -y install yum-fastestmirror && SysCount="1"
 		cp /etc/yum.conf /etc/yum.conf.back
 		sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
 		for arg do
@@ -65,7 +65,7 @@ INSTALL_BASE_PACKAGES(){
 		done;
 		mv -f /etc/yum.conf.back /etc/yum.conf;
 	else
-		[ -z $SysCount ] && apt-get update && SysCount="1"
+		[[ -z $SysCount ]] && apt-get update && SysCount="1"
 		apt-get -fy install;apt-get -y autoremove --purge;
 		dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P 
 		for arg do
@@ -74,4 +74,35 @@ INSTALL_BASE_PACKAGES(){
 		done;
 	fi;
 	return 1
+}
+INSTALL_BASE_CMD(){
+	declare count
+	declare -a ProgramsList
+	count=0
+	for arg do
+		TEST_PROGRAMS $arg
+		if [[ $? -eq 1 ]];then
+			ProgramsList[$count]=$arg
+			count=$[$count+1]
+		fi
+	done
+	INFO_MSG "正在安装这些程序:${ProgramsList[@]}" "Setting up these programs : ${ProgramsList[@]}"
+	INSTALL_BASE_PACKAGES ${ProgramsList[@]}
+}
+PACKET_TOOLS(){
+	declare CmdScript
+	declare InstallToolsScript
+	declare TmpCmdScript
+	INFO_MSG "正在打包,请稍后..." "Are packaged, please later..."
+	CmdScript="$1"
+	InstallToolsScript="$2"
+	#检测需要的程序
+	TEST_PROGRAMS "gzexe" "tar"
+	TEST_FILE "$CmdScript"
+	TEST_FILE "$InstallToolsScript"
+	[[ ! -d $ScriptPath/packet ]] && mkdir -p $ScriptPath/packet
+	cp $CmdScript ${DownloadTmp}/
+	TmpCmdScript=$(basename $CmdScript)
+	cd "${DownloadTmp}/" && gzexe "$TmpCmdScript" && tar -zcf "${TmpCmdScript%%.*}" "$TmpCmdScript" && cat $InstallToolsScript "${TmpCmdScript%%.*}" > $ScriptPath/packet/$(basename $InstallToolsScript) && cd $ScriptPath/packet/ && gzexe $(basename $InstallToolsScript) && mv ${DownloadTmp}/$(basename $InstallToolsScript) ${ScriptPath}/packet/$(basename $InstallToolsScript) && rm -rf ${DownloadTmp}/${TmpCmdScript}* && rm -rf ${ScriptPath}/packet/$(basename $InstallToolsScript)~ || EXIT_MSG "程序生成失败!" "The corresponding create false!"
+	INFO_MSG "安装包已生成,路径为:${ScriptPath}/packet/$(basename $InstallToolsScript)" "The installation package has been generated, the path is : ${ScriptPath}/packet/$(basename $InstallToolsScript)"
 }

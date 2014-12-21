@@ -32,7 +32,7 @@ SELECT_ENCRY_FUNCTION(){
 	echo "----------------------------------------------------------------"
 	declare -a VarLists
 	if $cn ;then
-		echo "[Notice] 请选择需要你想要加密的方式:"
+		echo "[Notice] 请选择需要你想要加密脚本的方式:"
 		VarLists=("使用gzexe压缩" "使用shc加密" "不加密")
 	else
 		echo "[Notice] How to encryption your script:"

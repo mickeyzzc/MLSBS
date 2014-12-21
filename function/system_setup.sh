@@ -62,10 +62,10 @@ SELECT_SYSTEM_SETUP_FUNCTION(){
 	declare -a VarLists
 	if $cn ;then
 		echo "[Notice] 请选择要运行的指令:"
-		VarLists=("返回首页" "添加用户" "一键优化" "时区设置" "设置防火墙")
+		VarLists=("返回首页" "添加用户" "一键优化" "时区设置" "设置防火墙" "任务生成")
 	else
 		echo "[Notice] Which function you want to run:"
-		VarLists=("back" "Add_User" "One_key_to_Optimize" "Timezone_set" "Iptables_set")
+		VarLists=("back" "Add_User" "One_key_to_Optimize" "Timezone_set" "Iptables_set" "Create_Cron")
 	fi
 	select var in ${VarLists[@]} ;do
 		case $var in
@@ -85,6 +85,10 @@ SELECT_SYSTEM_SETUP_FUNCTION(){
 				else
 					echo "your system is no supported my firewall script"
 				fi;;
+			${VarLists[5]})
+				SOURCE_SCRIPT $LibPath/decryption_encryption $FunctionPath/system/create_cron.sh
+				SELECT_ENCRY_FUNCTION
+				SELECT_CRON_FUNCTION;;
 			${VarLists[0]})
 				SELECT_RUN_SCRIPT;;
 			*)
