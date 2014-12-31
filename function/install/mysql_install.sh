@@ -1,44 +1,44 @@
 #!/bin/bash
 #base mysql's parameter
-[ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
+[[ ${RamTotal} -lt '1000' ]] && ERR_MSG "没有足够的内存安装MYSQL，最低要求1G内存。" "Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
 MYSQL_VAR(){
 	MysqlVersion="mysql-5.6.21"
 	MysqlLine="http://cdn.mysql.com/Downloads/MySQL-5.6"
-	MysqlPath="$InstallPath/mysql"
-	MysqlDataPath="$MysqlPath/data"
-	MysqlLogPath="$LogPath/mysql"
-	MysqlConfigPath="$MysqlPath"
+	MysqlPath="${InstallPath}/mysql"
+	MysqlDataPath="${MysqlPath}/data"
+	MysqlLogPath="${LogPath}/mysql"
+	MysqlConfigPath="${MysqlPath}"
 	MysqlPass=""
-	[ -z $MysqlPass ] && read -p "Please input MYSQL's password:" MysqlPass
+	[[ -z ${MysqlPass} ]] && read -s -p "Please input MYSQL's password:" MysqlPass
 }
 MYSQL_BASE_PACKAGES_INSTALL(){
-	if [ "$SysName" == 'centos' ] ;then
+	if [[ "$SysName" == 'centos' ]] ;then
 		yum -y remove mysql-server mysql;
 		BasePackages="wget gcc gcc-c++ autoconf libxml2-devel zlib-devel libjpeg-devel libpng-devel glibc-devel glibc-static glib2-devel  bzip2-devel openssl-devel ncurses-devel bison cmake make";
 	else
 		apt-get -y remove mysql-client mysql-server mysql-common;
 		BasePackages="wget gcc g++ cmake libjpeg-dev libxml2 libxml2-dev libpng-dev autoconf make bison zlibc bzip2 libncurses5-dev libncurses5 libssl-dev";
 	fi
-	INSTALL_BASE_PACKAGES $BasePackages
+	INSTALL_BASE_PACKAGES ${BasePackages}
 }
 #install mysql
 INSTALL_MYSQL(){
-	cd $DownloadTmp
-	echo "[${MysqlVersion} Installing] ************************************************** >>";
-	[ ! -f ${MysqlVersion}.tar.gz ] && wget -c ${MysqlLine}/${MysqlVersion}.tar.gz
-	tar -zxf $DownloadTmp/$MysqlVersion.tar.gz;
-	cd $DownloadTmp/$MysqlVersion;
+	cd ${DownloadTmp}
+	INFO_MSG "[正在安装 ${MysqlVersion}] ************************************************** >>" "[${MysqlVersion} Installing] ************************************************** >>";
+	[[ ! -f ${MysqlVersion}.tar.gz ]] && wget -c ${MysqlLine}/${MysqlVersion}.tar.gz
+	tar -zxf ${DownloadTmp}/${MysqlVersion}.tar.gz;
+	cd ${DownloadTmp}/${MysqlVersion};
 	groupadd mysql;
 	useradd -s /sbin/nologin -g mysql mysql;
-	cmake -DCMAKE_INSTALL_PREFIX=$MysqlPath -DWITH_DEBUG=OFF -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=ON -DENABLED_LOCAL_INFILE=ON -DWITH_INNODB_MEMCACHED=ON -DWITH_UNIT_TESTS=OFF;
+	cmake -DCMAKE_INSTALL_PREFIX=${MysqlPath} -DWITH_DEBUG=OFF -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=ON -DENABLED_LOCAL_INFILE=ON -DWITH_INNODB_MEMCACHED=ON -DWITH_UNIT_TESTS=OFF;
 	make &&	make install;
-	for path in $MysqlLogPath $MysqlPath $MysqlConfigPath/conf.d $MysqlDataPath;do
-		[ ! -d $path ] && mkdir -p $path
-		chmod 775 $path;
-		chown -R mysql:mysql $path;
+	for path in ${MysqlLogPath} ${MysqlPath} ${MysqlConfigPath}/conf.d ${MysqlDataPath};do
+		[[ ! -d ${path} ]] && mkdir -p ${path}
+		chmod 764 ${path};
+		chown -R mysql:mysql ${path};
 	done
 # EOF **********************************
-cat > $MysqlConfigPath/my.cnf<<EOF;
+cat > ${MysqlConfigPath}/my.cnf<<EOF;
 [mysqld]
 user		= mysql
 server-id	= 1
@@ -50,7 +50,6 @@ datadir		= $MysqlDataPath
 bind-address	= 0.0.0.0
 skip-name-resolve
 skip-external-locking
-thread_concurrency	= `expr $CpuProNum \* 2`
 max_connections	= `expr $FileMax \* $CpuProNum \* 2 / $RamTotal`
 max_connect_errors	= 30
 table_open_cache	= `expr $RamTotal + $RamSwap`
@@ -93,34 +92,34 @@ quote-names
 max_allowed_packet	= 16M
 EOF
 # **************************************
-	$MysqlPath/scripts/mysql_install_db --user=mysql --defaults-file=$MysqlConfigPath/my.cnf --basedir=$MysqlPath --datadir=$MysqlDataPath;
+	${MysqlPath}/scripts/mysql_install_db --user=mysql --defaults-file=${MysqlConfigPath}/my.cnf --basedir=${MysqlPath} --datadir=${MysqlDataPath};
 # EOF **********************************
 cat > /etc/ld.so.conf.d/mysql.conf<<EOF
-$MysqlPath/lib
+${MysqlPath}/lib
 EOF
 # **************************************
 	ldconfig;
 	rm -f /usr/lib64/mysql /usr/lib/mysql /etc/init.d/mysqld
-	[ "$SysBit" == '64' ] && ln -s $MysqlPath/lib/mysql /usr/lib64/mysql
-	[ $? -gt 0 ] && ln -s $MysqlPath/lib/mysql /usr/lib/mysql
-	cp $MysqlPath/support-files/mysql.server /etc/init.d/mysqld;
+	[[ "${SysBit}" == '64' ]] && ln -s ${MysqlPath}/lib/mysql /usr/lib64/mysql
+	[[ $? -gt 0 ]] && ln -s ${MysqlPath}/lib/mysql /usr/lib/mysql
+	cp ${MysqlPath}/support-files/mysql.server /etc/init.d/mysqld;
 	chmod 775 /etc/init.d/mysqld;
 	/etc/init.d/mysqld start;
 	for i in mysql mysqladmin mysqlcheck mysqldump;do
 		rm -rf /usr/bin/$i
-		ln -s $MysqlPath/bin/$i /usr/bin/$i;
+		ln -s ${MysqlPath}/bin/$i /usr/bin/$i;
 	done
-	$MysqlPath/bin/mysqladmin password $MysqlPass;
-	rm -rf $MysqlDataPath/test;
+	${MysqlPath}/bin/mysqladmin password ${MysqlPass};
+	rm -rf ${MysqlDataPath}/test;
 # EOF **********************************
-mysql -hlocalhost -uroot -p$MysqlPass <<EOF
+mysql -hlocalhost -uroot -p${MysqlPass} <<EOF
 USE mysql;
 DELETE FROM user WHERE user='';
-UPDATE user set password=password('$MysqlPass') WHERE user='root';
+UPDATE user set password=password('${MysqlPass}') WHERE user='root';
 DELETE FROM user WHERE not (user='root');
 DROP USER ''@'%';
 FLUSH PRIVILEGES;
 EOF
 # **************************************
-	echo "[OK] ${MysqlVersion} install completed.";
+	INFO_MSG "${MysqlVersion}已经安装完毕！" "[OK] ${MysqlVersion} install completed.";
 }

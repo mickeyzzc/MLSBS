@@ -29,19 +29,18 @@ cat > $ScriptPath/config <<eof
 #! Encoding UTF-8
 #配置参数
 #基础路径
-InstallPath="/usr/local"
-DownloadTmp="/tmp"
-LogPath="/var/log"
+InstallPath="$InstallPath"
+DownloadTmp="$DownloadTmp"
+LogPath="$LogPath"
 #程序路径
 LibPath="\$ScriptPath/mylib"
 FunctionPath="\$ScriptPath/function"
 TemplatePath="\$ScriptPath/Template"
 MyCronBashPath="\$InstallPath/mybash"
 MyBashLogPath="\$LogPath/mybash"
-Python2Path="\$ScriptPath/py2script"
 #日志路径
-InfoLog=\$LogPath/mlsbs_err\$(date +%Y%m%d).log
-ErrLog=\$LogPath/mlsbs_info\$(date +%Y%m%d).log
+InfoLog=\$LogPath/mlsbs_err_\$(date +%Y%m%d).log
+ErrLog=\$LogPath/mlsbs_info_\$(date +%Y%m%d).log
 #check system parameter about cpu's core ,ram ,other
 #
 #收集系统的一些基础参数给其他函数使用
@@ -61,14 +60,17 @@ eof
 [[ ! -f $ScriptPath/config ]] && CONFIG_CREATE
 source $ScriptPath/config
 #################错误提示##############################
+ERR_MSG(){
+	$cn && ErrMsg="$1" || ErrMsg="$2"
+	echo -e "$(date +%Y-%m-%d-%H:%M) -ERR ：${ErrMsg} " |tee -a ${ErrLog}
+}
 EXIT_MSG(){
-	$cn && ExitMsg="$1" || ExitMsg="$2"
-	echo -e "$(date +%Y-%m-%d-%H:%M) -ERR $ExitMsg " |tee -a $ErrLog && exit 1
+	ERR_MSG "$1" "$2" && exit 1
 }
 #########普通日志##########
 INFO_MSG(){
 	$cn && InfoMsg="$1" || InfoMsg="$2"
-	echo -e "$(date +%Y-%m-%d-%H:%M) -INFO $InfoMsg " |tee -a $InfoLog
+	echo -e "$(date +%Y-%m-%d-%H:%M) -INFO ：${InfoMsg} " |tee -a ${InfoLog}
 }
 #检测脚本文件是否存在并加载
 SOURCE_SCRIPT(){

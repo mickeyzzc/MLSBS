@@ -7,12 +7,11 @@ FunctionPath="$ScriptPath/function"
 TemplatePath="$ScriptPath/Template"
 MyCronBashPath="$InstallPath/mybash"
 MyBashLogPath="$LogPath/mybash"
-Python2Path="$ScriptPath/py2script"
 DownloadTmp="/tmp"
 #日志
 LogPath="/var/log"
-InfoLog=$LogPath/mlsbs_err$(date +%Y%m%d).log
-ErrLog=$LogPath/mlsbs_info$(date +%Y%m%d).log
+InfoLog=$LogPath/mlsbs_err_$(date +%Y%m%d).log
+ErrLog=$LogPath/mlsbs_info_$(date +%Y%m%d).log
 #check system parameter about cpu's core ,ram ,other
 #
 #收集系统的一些基础参数给其他函数使用
