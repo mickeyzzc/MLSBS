@@ -2,7 +2,7 @@
 #base mysql's parameter
 [ $RamTotal -lt '1000' ] && echo -e "[Error] Not enough memory install mysql.\nThis script need memory more than 1G.\n" && SELECT_RUN_SCRIPT;
 MYSQL_VAR(){
-	MysqlVersion="mysql-5.6.21"
+	MysqlVersion="mysql-5.6.30"
 	MysqlLine="http://cdn.mysql.com/Downloads/MySQL-5.6"
 	MysqlPath="$InstallPath/mysql"
 	MysqlDataPath="$MysqlPath/data"
